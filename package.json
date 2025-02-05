@@ -1,0 +1,64 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "commonjs",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development concurrently \"vite\" \"electron .\"",
+    "clean": "rimraf dist dist_electron",
+    "build:frontend": "vite build",
+    "build:electron": "electron-builder",
+    "build": "npm run clean && npm run build:frontend && npm run build:electron",
+    "start": "electron .",
+    "electron:dev": "electron .",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^8.0.1",
+    "cross-env": "^7.0.3",
+    "electron": "^34.0.2",
+    "electron-builder": "^25.1.8",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "rimraf": "^6.0.1",
+    "vite": "^6.0.5"
+  },
+  "build": {
+    "appId": "com.devname.package",
+    "productName": "Project Name",
+    "copyright": "Copyright © 2025 Volyntsev Maksim",
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "electronDownload": {
+      "cache": "./electron_cache"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "dist/**/*",
+      "electron/main.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist_electron"
+    }
+  }
+}
