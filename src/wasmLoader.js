@@ -1,26 +1,31 @@
 export async function loadWasm() {
-  const wasmBinary = await fetch("/test.wasm").then((res) => res.arrayBuffer());
-  const module = await import("@/wasm/test.js");
+  try {
+    let wasmUrl;
 
-  const wasmInstance = await module.default({ wasmBinary });
-
-  function readWasmString(ptr) {
-    const memory = wasmInstance.HEAPU8;
-    let str = "";
-    let i = ptr;
-
-    while (memory[i] !== 0) {
-      str += String.fromCharCode(memory[i]);
-      i++;
+    if (import.meta.env.MODE === "development") {
+      wasmUrl = "/test.wasm"; // В dev-режиме
+    } else {
+      const wasmPath = await window.electron.getWasmPath();
+      wasmUrl = `file://${wasmPath.replace(/\\/g, "/")}`;
     }
 
-    return str;
-  }
+    console.log("WASM URL:", wasmUrl);
 
-  return {
-    getMessage: () => {
-      const ptr = wasmInstance._getMessage();
-      return readWasmString(ptr);
-    },
-  };
+    const wasmBinary = await fetch(wasmUrl).then((res) => res.arrayBuffer());
+    const module = await import("@/wasm/test.js");
+
+    const wasmInstance = await module.default({ wasmBinary });
+
+    return {
+      wasmInstance,
+      ccall: wasmInstance.ccall.bind(wasmInstance),
+      getData: () => {
+        const jsonStr = wasmInstance.ccall("getData", "string", [], []);
+        return JSON.parse(jsonStr);
+      },
+    };
+  } catch (error) {
+    console.error("Ошибка загрузки WASM:", error);
+    throw error;
+  }
 }

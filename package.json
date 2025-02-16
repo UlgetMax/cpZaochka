@@ -9,6 +9,7 @@
     "clean": "rimraf dist dist_electron",
     "build:frontend": "vite build",
     "build:electron": "electron-builder",
+    "build:copy-wasm": "echo 'Copying WASM... skipped, handled by electron-builder'",
     "build": "npm run clean && npm run build:frontend && npm run build:electron",
     "start": "electron .",
     "electron:dev": "electron .",
@@ -16,9 +17,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "docx": "^9.1.1",
+    "file-saver": "^2.0.5",
     "node-addon-api": "^8.3.0",
+    "pg": "^8.13.3",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.1.5",
+    "vite-plugin-wasm": "^3.4.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -38,8 +44,8 @@
     "vite": "^6.0.5"
   },
   "build": {
-    "appId": "com.devname.package",
-    "productName": "Project Name",
+    "appId": "com.ulgetMax.package",
+    "productName": "Zaochka",
     "copyright": "Copyright © 2025 Volyntsev Maksim",
     "mac": {
       "category": "public.app-category.utilities"
@@ -54,8 +60,15 @@
     "files": [
       "dist/**/*",
       "electron/main.js",
+      "electron/preload.js",
       "node_modules/**/*",
       "package.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "public/test.wasm",
+        "to": "resources/test.wasm"
+      }
     ],
     "directories": {
       "buildResources": "assets",
