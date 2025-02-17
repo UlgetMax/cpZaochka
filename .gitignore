@@ -15,6 +15,10 @@ dist-ssr
 # Electron build files
 dist_electron/*
 electron_cache/*
+dist_electron.zip
+dist_electron_1.zip
+dist_electron_2.zip
+
 
 # Editor directories and files
 .vscode/*
