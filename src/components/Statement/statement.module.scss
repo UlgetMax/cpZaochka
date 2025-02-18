@@ -1,0 +1,84 @@
+.statement {
+
+    width: 100%;
+    padding: 30px 20px 0 20px;
+
+    .statement__header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        
+        .statement__header__img {
+            cursor: pointer;
+            padding: 6px;
+            
+            border-radius: 20%;
+            transition: 0.2s ease-in;
+
+            .statement__header__arrow {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+
+            }
+            &:hover {
+                background-color: #555555;
+            }
+        }
+        h1 {
+            flex-grow: 1;
+            font-size: 20px;
+            text-align: center;
+        }
+
+    }
+    
+    .statement__wrapper {
+
+        .statement__wrapper__class {
+            padding: 10px 15px;
+            width: 350px;
+            color: #000;
+            background-color: #757575;
+            border-radius: 6px;
+        }
+
+        .statement__wrapper__group {
+            margin: 20px 0 30px 0;
+
+            .statement__wrapper__group {
+                padding: 10px 15px;
+                width: 350px;
+                color: #000;
+                background-color: #757575;
+                border-radius: 6px;
+            }
+
+            .dropdown-list {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                max-height: 150px; /* Ограничение высоты выпадающего списка */
+                overflow-y: auto;
+                z-index: 1;
+
+                .dropdown-item {
+                    padding: 10px;
+                    cursor: pointer;
+                }
+                  
+                .dropdown-item:hover {
+                    background-color: #eee;
+                }
+            }
+        }
+          
+          
+          
+          
+        
+    }
+}
