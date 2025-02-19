@@ -1,0 +1,37 @@
+.supplement {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+    padding: 30px 20px 0 20px;
+
+    .supplement__header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+        
+        .supplement__header__img {
+            cursor: pointer;
+            padding: 6px;
+            
+            border-radius: 20%;
+            transition: 0.2s ease-in;
+
+            .supplement__header__arrow {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+
+            }
+            &:hover {
+                background-color: #555555;
+            }
+        }
+        h1 {
+            flex-grow: 1;
+            font-size: 20px;
+            text-align: center;
+        }
+
+    }
+}

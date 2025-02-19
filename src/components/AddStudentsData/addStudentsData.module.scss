@@ -1,40 +1,121 @@
-// .statement__wrapper {
-//     padding: 20px;
+.addStudents {
+  margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    // min-height: 100vh;
+    // padding: 30px 20px 0 20px;
+
+    .addStudents__header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 40px;
+
+        .addStudents__header__img {
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 20%;
+            transition: 0.2s ease-in;
+
+            .addStudents__header__arrow {
+                flex-shrink: 0;
+                width: 24px;
+                height: 24px;
+            }
+            
+            &:hover {
+                background-color: #555555;
+            }
+        }
+
+        h1 {
+            flex-grow: 1;
+            font-size: 20px;
+            text-align: center;
+        }
+    }
+
+    .addStudents__wrapper {
+
+      .addStudents__wrapper__input {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 20px;
+
+
+        .addStudents__wrapper__input__group {
+          padding: 10px 5px;
+          background-color: #5b5b5b;
+          width: 150px;
+        }
   
-//     form {
-//       margin-bottom: 20px;
-  
-//       input {
-//         padding: 8px;
-//         margin-right: 10px;
-//       }
-  
-//       button {
-//         padding: 8px 16px;
-//         background-color: #007bff;
-//         color: white;
-//         border: none;
-//         cursor: pointer;
-  
-//         &:hover {
-//           background-color: #0056b3;
-//         }
-//       }
-//     }
-  
-//     table {
-//       width: 100%;
-//       border-collapse: collapse;
-  
-//       th, td {
-//         padding: 10px;
-//         border: 1px solid #ddd;
-//         text-align: left;
-//       }
-  
-//       th {
-//         text-align: center;
-//         background-color: #28292d;
-//       }
-//     }
-//   }
+        .addStudents__wrapper__input__specialties {
+          padding: 10px 5px;
+          background-color: #5b5b5b;
+          width: 300px;
+        }
+      }
+
+      .addStudents__wrapper__buttons {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 20px;
+
+        input[type="file"] {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+        //   background-color: #f9f9f9;
+          cursor: pointer;
+          transition: 0.2s ease-in;
+    
+          &:hover {
+            background-color: #262626;
+          }
+        }
+
+        button {
+          padding: 10px 5px;
+          background-color: #5b5b5b;
+          border-radius: 5px;
+          width: 150px;
+        }
+      }
+      
+      .addStudents__wrapper__table {
+        max-height: 430px; 
+        overflow-y: auto; 
+        border-top: 1px solid #ccc; 
+        border-bottom: 1px solid #ccc; 
+
+
+        .studentsTable {
+          width: 100%;
+          border-collapse: collapse;
+    
+          th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+          }
+    
+          th {
+            background-color: #5b5b5b;
+            color: white;
+            font-weight: bold;
+          }
+    
+          tr:nth-child(even) {
+            background-color: #181818;
+          }
+    
+          tr:hover {
+            background-color: #2a2a2a;
+          }
+        }
+      }
+      
+    }
+    
+}

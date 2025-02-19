@@ -1,7 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
 
-export function generateDocx(course, semester, group, students, specialization, predmet, teacher) {
+export function generateDocx__DiplomSupplement(course, semester, group, students, specialization, predmet, teacher) {
 
     // if (!Array.isArray(students) || students.length === 0) {
     //     console.warn("Предупреждение: передан пустой список студентов.");

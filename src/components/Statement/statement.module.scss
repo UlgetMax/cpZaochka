@@ -1,6 +1,8 @@
 .statement {
-
+    display: flex;
+    flex-direction: column;
     width: 100%;
+    min-height: 100vh;
     padding: 30px 20px 0 20px;
 
     .statement__header {
@@ -34,51 +36,232 @@
     }
     
     .statement__wrapper {
+        flex: 1;
 
-        .statement__wrapper__class {
+        .statement__wrapper__classInput {
             padding: 10px 15px;
             width: 350px;
             color: #000;
-            background-color: #757575;
-            border-radius: 6px;
+            background-color: #e7e1e1;
+            border-radius: 2px;
         }
 
-        .statement__wrapper__group {
+        .statement__wrapper__Row {
+            display: flex;
+            align-items: center;
+            gap: 30px;
             margin: 20px 0 30px 0;
 
             .statement__wrapper__group {
-                padding: 10px 15px;
-                width: 350px;
-                color: #000;
-                background-color: #757575;
-                border-radius: 6px;
+                position: relative;
+    
+                .statement__wrapper__groupInput {
+                    padding: 10px 15px;
+                    width: 350px;
+                    color: #000;
+                    background-color: #e7e1e1;
+                    border-radius: 2px;
+                }
+    
+                .dropdownList{
+                    position: absolute;
+                    top: 109%;
+                    left: 0;
+                    right: 0;
+                    background-color: #fff;
+                    border: 1px solid #949393;
+                    max-height: 150px; 
+                    overflow-y: auto;
+                    z-index: 1;
+    
+                    .dropdownItem {
+                        color: #555555;
+                        padding: 10px;
+                        cursor: pointer;
+                    }
+                      
+                    .dropdownItem:hover {
+                        background-color: #eee;
+                    }
+                }
+            }
+    
+            .statement__wrapper__curs {
+    
+    
+                .statement__wrapper__cursInput {
+                    padding: 10px 15px;
+                    width: 100px;
+                    color: #000;
+                    background-color: #e7e1e1;
+                    border-radius: 2px;
+                }
             }
 
-            .dropdown-list {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background-color: #fff;
-                border: 1px solid #ccc;
-                max-height: 150px; /* Ограничение высоты выпадающего списка */
-                overflow-y: auto;
-                z-index: 1;
+            .statement__wrapper__semester {
 
-                .dropdown-item {
-                    padding: 10px;
-                    cursor: pointer;
+                .statement__wrapper__semesterInput {
+                    padding: 10px 15px;
+                    width: 100px;
+                    color: #000;
+                    background-color: #e7e1e1;
+                    border-radius: 2px;
                 }
-                  
-                .dropdown-item:hover {
-                    background-color: #eee;
-                }
+            }
+
+        }
+
+        // .statement {
+        //     padding: 20px;
+        
+        //     &__header {
+        //         display: flex;
+        //         align-items: center;
+        //         gap: 10px;
+        //         margin-bottom: 20px;
+        
+        //         h1 {
+        //             font-size: 24px;
+        //         }
+        //     }
+        
+        //     &__wrapper {
+        //         display: flex;
+        //         flex-direction: column;
+        //         gap: 20px;
+        //     }
+        
+        //     &__table {
+        //         width: 100%;
+        //         border-collapse: collapse;
+        //         margin-top: 20px;
+        
+        //         th, td {
+        //             border: 1px solid #ccc;
+        //             padding: 10px;
+        //             text-align: left;
+        //         }
+        
+        //         th {
+        //             background-color: #3c3c3c;
+        //             text-align: center;
+        //         }
+        
+        //         td {
+        //             input {
+        //                 width: 100%;
+        //                 padding: 5px;
+        //                 border: 1px solid #ccc;
+        //             }
+        //         }
+        //     }
+        
+        //     .editIcon {
+        //         cursor: pointer;
+        //         width: 20px;
+        //         height: 20px;
+        //         transition: transform 0.2s ease-in-out;
+        
+        //         &:hover {
+        //             transform: scale(1.1);
+        //         }
+        //     }
+        // }
+        
+
+        .statement__tableWrapper {
+            max-height: 400px; /* Ограничиваем высоту */
+            overflow-y: auto; /* Добавляем вертикальный скролл при необходимости */
+            border: 1px solid #ccc; /* Граница вокруг таблицы */
+            border-radius: 8px;
+        }
+        
+        .statement__table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        // .statement__table td {
+        //     // text-align: center;
+
+        //     & input {
+        //         width: 100%;
+        //     }
+        // }
+        .id__col {
+            width: 5%;
+            border-right: 1px solid #ccc;
+        }
+
+        .fio__col {
+            width: 100%;
+
+            & input {
+                padding: 5px 5px;
+                width: 100%;
+                background-color: #555555;
             }
         }
+
+        .statement__table th, 
+        .statement__table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+
+            // & td :last-child,
+            // & th :last-child {
+            //     border-bottom: 0px solid #ddd;
+            // }
+        }
+        
+        /* Скрываем заголовок "Редактировать" */
+        .statement__table th:last-child {
+            width: 40px;
+            color: transparent; 
+            border: none;
+        }
+        
+        /* Убираем границы у последней колонки */
+        .statement__table td:last-child {
+            border: none;
+            text-align: center;
+        }
+        
+        /* Стилизация иконки редактирования */
+        .editIcon {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out;
+        }
+        
+        .editIcon:hover {
+            opacity: 1;
+        }
+        
+        
+
           
           
           
           
         
+    }
+
+    .statement__footer {
+        margin: 0 0 40px 0;
+        flex-shrink: 0;
+        display: flex;
+        justify-content: center;
+        align-items: end;
+
+        .statement__footer__btn {
+            padding: 10px 5px;
+            width: 280px;
+            border-radius: 4px;
+            font-size: 17px;
+        }
     }
 }
