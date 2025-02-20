@@ -1,5 +1,5 @@
 .addStudents {
-  margin-top: 40px;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -36,11 +36,15 @@
     }
 
     .addStudents__wrapper {
+      position: relative;
+      padding-bottom: 30px;
 
       .addStudents__wrapper__input {
         display: flex;
         gap: 40px;
         margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #3d3d3d;
 
 
         .addStudents__wrapper__input__group {
@@ -113,6 +117,35 @@
           tr:hover {
             background-color: #2a2a2a;
           }
+        }
+      }
+
+      .addStudents__wrapper__editButtons {
+        position: absolute;
+        // bottom: 0; /* Центрируем по вертикали */
+        left: 50%; /* Центрируем по горизонтали */
+        transform: translate(-50%); 
+        margin-top: 20px;
+        display: flex;
+        gap: 25px;
+
+        .addStudents__wrapper__editButtons__save {
+          background-color: #2373f3;
+          color: #fff;
+          padding: 10px 5px;
+          border-radius: 5px;
+          width: 250px;
+          font-weight: 500;
+
+        }
+
+        .addStudents__wrapper__editButtons__delete {
+          background-color: #be2e2e;
+          color: #fff;
+          padding: 10px 5px;
+          border-radius: 5px;
+          width: 150px;
+          font-weight: 500;
         }
       }
       

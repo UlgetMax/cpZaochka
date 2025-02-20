@@ -8,5 +8,8 @@ contextBridge.exposeInMainWorld("electron", {
   getStudentsByGroup: (groupId) => ipcRenderer.invoke("get-students-by-group", groupId),
   getSpecialties: () => ipcRenderer.invoke("get-specialties"),
   addStudents: (students) => ipcRenderer.invoke("add-students", students),
-
+  getStudentsByGroupAndSpecialty: (groupId, specialtyId) => 
+    ipcRenderer.invoke("get-students-by-group-and-specialty", groupId, specialtyId),
+  deleteStudents: (students) => ipcRenderer.invoke('delete-students', students),
+  updateStudents: (students) => ipcRenderer.invoke('update-students', students),
 });

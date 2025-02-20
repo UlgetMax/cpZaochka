@@ -165,9 +165,9 @@ ipcMain.handle("add-students", async (event, students) => {
 
       for (const student of students) {
           await client.query(query, [
-              student.firstName,
-              student.lastName,
-              student.middleName || null,
+              student.first_name, 
+              student.last_name,  
+              student.middle_name || null, 
               student.group_id,
               student.specialty_id,
           ]);
@@ -193,10 +193,72 @@ ipcMain.handle("get-students-by-group", async (_, groupId) => {
   }
 });
 
+ipcMain.handle("get-students-by-group-and-specialty", async (_, groupId, specialtyId) => {
+  try {
+    const res = await client.query(`
+      SELECT s.id, s.last_name, s.first_name, s.middle_name, s.group_id, s.specialty_id, g.name as group_name, sp.name as specialty_name
+      FROM students s
+      LEFT JOIN groups g ON s.group_id = g.id
+      LEFT JOIN specialties sp ON s.specialty_id = sp.id
+      WHERE ($1::int IS NULL OR s.group_id = $1)
+      AND ($2::int IS NULL OR s.specialty_id = $2)
+    `, [groupId, specialtyId]);
+    return res.rows;
+  } catch (err) {
+    console.error("Ошибка получения студентов:", err);
+    return [];
+  }
+});
+
+
+ipcMain.handle("update-students", async (event, students) => {
+  try {
+      const query = `
+          UPDATE students
+          SET first_name = $1, last_name = $2, middle_name = $3, group_id = $4, specialty_id = $5
+          WHERE id = $6
+      `;
+
+      for (const student of students) {
+          await client.query(query, [
+              student.first_name,
+              student.last_name,
+              student.middle_name || null,
+              student.group_id,
+              student.specialty_id,
+              student.id,
+          ]);
+      }
+
+      return { success: true };
+  } catch (err) {
+      console.error("Ошибка обновления студентов:", err);
+      return { success: false, error: err.message };
+  }
+});
+
+
+ipcMain.handle("delete-students", async (event, students) => {
+  try {
+      const query = `
+          DELETE FROM students
+          WHERE id = $1
+      `;
+
+      for (const student of students) {
+          await client.query(query, [student.id]);
+      }
+
+      return { success: true };
+  } catch (err) {
+      console.error("Ошибка удаления студентов:", err);
+      return { success: false, error: err.message };
+  }
+});
 
 
 
-///
+///BD
 
 ipcMain.handle("get-wasm-path", () => {
   return path.join(process.resourcesPath, "test.wasm");
