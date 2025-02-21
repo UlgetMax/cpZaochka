@@ -1,11 +1,7 @@
 import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } from "docx";
 import { saveAs } from "file-saver";
 
-export function generateDocx__DiplomSupplement(course, semester, group, students, specialization, predmet, teacher) {
-
-    // if (!Array.isArray(students) || students.length === 0) {
-    //     console.warn("Предупреждение: передан пустой список студентов.");
-    // }
+export function generateDocx__DiplomSupplement(group, students, specialization, predmet, teacher) {
 
 
     const doc = new Document({
@@ -27,10 +23,10 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         alignment: AlignmentType.CENTER,
                         children: [
                             new TextRun({
-                                text: "Частное учреждение образования «Колледж бизнеса и права»",
+                                text: "Частное учреждение образования",
                                 bold: true,
                                 underline: {},
-                                size: 28, // 28 half-points = 14pt
+                                size: 32, 
                             }),
                         ],
                     }),
@@ -38,10 +34,10 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         alignment: AlignmentType.CENTER,
                         children: [
                             new TextRun({
-                                text: "Брестский филиал",
+                                text: "«Колледж бизнеса и права» Брестсикй филиал",
                                 bold: true,
                                 underline: {},
-                                size: 28,
+                                size: 32,
 
                             }),
                         ],
@@ -50,8 +46,8 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         alignment: AlignmentType.CENTER,
                         children: [
                             new TextRun({
-                                text: "(наименование учреждения образования (филиала, иного обособленного подразделения))",
-                                size: 20,
+                                text: "(наименование учебного заведения)",
+                                size: 24,
         
                             }),
                         ],
@@ -63,9 +59,9 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         alignment: AlignmentType.CENTER,
                         children: [
                             new TextRun({
-                                text: "ЭКЗАМЕНАЦИОННАЯ ВЕДОМОСТЬ ",
+                                text: "В Е Д О М О С Т Ь",
                                 bold: true,
-                                size: 32,
+                                size: 56,
                      
                             }),
                         ],
@@ -77,46 +73,19 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         alignment: AlignmentType.LEFT,
                         children: [
                             new TextRun({
-                                text: "Учебный предмет, модуль ",
+                                text: `отметок успеваемости учащихся группы № ${group}`,
+                                size: 28,
 
                             }),
                             new TextRun({
-                                text: `      ${predmet}      `, 
-                                underline: {}, 
+                                text: `(для занесения в приложение к диплому)`, 
+                                size: 28,
                             }),
                         ]
                     }),
 
-                    new Paragraph({
-                        alignment: AlignmentType.LEFT,
-                        children: [
-                            new TextRun({
-                                text: "Курс ",
-                    
-                            }),
-                            new TextRun({
-                                text: `      ${course}      `, 
-                                underline: {}, 
-                            }),
+                    new Paragraph({}),
 
-                            new TextRun({
-                                text: "Семестр ",
-                            }),
-
-                            new TextRun({
-                                text: `      ${semester}      `, 
-                                underline: {}, 
-                            }),
-                            new TextRun({
-                                text: "Учебная группа ",
-                            }),
-
-                            new TextRun({
-                                text: `      ${group}      `, 
-                                underline: {}, 
-                            }),
-                        ],
-                    }),
                     new Paragraph({
                         alignment: AlignmentType.LEFT,
                         children: [
@@ -125,7 +94,29 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                     
                             }),
                             new TextRun({
-                                text: `      «${specialization}»      `, 
+                                text: `      ${specialization}      `, 
+                                underline: {}, 
+                            }),
+
+                            new TextRun({
+                                text: "",
+                            }),
+
+                            
+                            
+                        ],
+                    }),
+
+                    
+                    new Paragraph({
+                        alignment: AlignmentType.LEFT,
+                        children: [
+                            new TextRun({
+                                text: "Наименование учебной дисциплины ",
+                            }),
+
+                            new TextRun({
+                                text: `      ${predmet}      `, 
                                 underline: {}, 
                             }),
                         ],
@@ -134,9 +125,9 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         alignment: AlignmentType.LEFT,
                         children: [
                             new TextRun({
-                                text: "Преподаватель(и) ",
-                    
+                                text: "Преподаватель ",
                             }),
+
                             new TextRun({
                                 text: `      ${teacher}      `, 
                                 underline: {}, 
@@ -144,15 +135,7 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                         ],
                     }),
 
-                    new Paragraph({
-                        alignment: AlignmentType.CENTER,
-                        children: [
-                            new TextRun({
-                                text: "(фамилия, собственное имя, отчество (если таковое имеется))",
-                                size: 20,
-                            }),
-                        ],
-                    }),
+                    new Paragraph({}),
 
                     new Table({
                         width: { size: 100, type: WidthType.PERCENTAGE },
@@ -160,10 +143,9 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                             new TableRow({
                                 children: [
                                     new TableCell({ children: [headerText("№ п/п")] }),
-                                    new TableCell({ children: [headerText("Фамилия, имя, отчество")] }),
-                                    new TableCell({ children: [headerText("Отметка о зачёте")] }),
-                                    new TableCell({ children: [headerText("Вариант задания")] }),
-                                    new TableCell({ children: [headerText("Отметка")] }),
+                                    new TableCell({ children: [headerText("Ф. И. О. учащегося")] }),
+                                    new TableCell({ children: [headerText("Отметказа каждый семестр")] }),
+                                    new TableCell({ children: [headerText("Отметка к диплому")] }),
                                     new TableCell({ children: [headerText("Подпись преподавателя")] }),
                                 ],
                             }),
@@ -172,10 +154,8 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
                                     children: [
                                         new TableCell({ children: [cellText(index + 1)] }),
                                         new TableCell({ children: [cellText(student.name)] }), 
-                                        // new TableCell({ children: [cellText(student.pass ? "зачтено" : "незачёт")] }),
-                                        new TableCell({ children: [cellText("зачтено")] }),
-                                        new TableCell({ children: [cellText(student.variant || "-")] }),
-                                        new TableCell({ children: [cellText(student.mark || "-")] }),
+                                        new TableCell({ children: [cellText("оценка за каждый семестр")] }), //Здесь должно быть по 2 оценки такого формата 4 (четыре) 6 (шесть)
+                                        new TableCell({ children: [cellText("отметка к диплому")] }), // здесь одна оценка формат 4 (четыре)
                                         new TableCell({ children: [cellText("")] }),
                                     ],
                                 })
@@ -188,7 +168,7 @@ export function generateDocx__DiplomSupplement(course, semester, group, students
     });
 
     Packer.toBlob(doc).then((blob) => {
-        saveAs(blob, "vedomost.docx");
+        saveAs(blob, "diplomSupplement.docx");
     });
 }
 
@@ -198,9 +178,7 @@ function headerText(text) {
         children: [
             new TextRun({
                 text,
-                bold: true,
-                underline: {},
-                size: 28,
+                size: 24,
                 font: "Times New Roman",
             }),
         ],
@@ -213,7 +191,7 @@ function cellText(text) {
         children: [
             new TextRun({
                 text: text.toString(),
-                size: 28,
+                size: 24,
                 font: "Times New Roman",
             }),
         ],

@@ -9,19 +9,18 @@
         display: flex;
         align-items: center;
         margin-bottom: 40px;
-        
+
         .supplement__header__img {
             cursor: pointer;
             padding: 6px;
-            
+
             border-radius: 20%;
             transition: 0.2s ease-in;
 
             .supplement__header__arrow {
-            flex-shrink: 0;
-            width: 24px;
-            height: 24px;
-
+                flex-shrink: 0;
+                width: 24px;
+                height: 24px;
             }
             &:hover {
                 background-color: #555555;
@@ -32,6 +31,42 @@
             font-size: 20px;
             text-align: center;
         }
+    }
 
+    .supplement__wrapper {
+
+
+        .supplement__tableWrapper {
+            max-height: 430px;
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+      
+            .supplement__table {
+              width: 100%;
+              border-collapse: collapse;
+      
+              th,
+              td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: left;
+              }
+      
+              th {
+                background-color: #5b5b5b;
+                color: white;
+                font-weight: bold;
+              }
+      
+              tr:nth-child(even) {
+                background-color: #181818;
+              }
+      
+              tr:hover {
+                background-color: #2a2a2a;
+              }
+            }
+          }
     }
 }

@@ -102,7 +102,7 @@ async function createWindow() {
     height,
     // kiosk: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'), 
+      preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
     },
@@ -147,46 +147,51 @@ ipcMain.handle("get-groups", async () => {
     return [];
   }
 });
+
 ipcMain.handle("get-specialties", async () => {
   try {
-      const res = await client.query("SELECT id, name FROM specialties");
-      return res.rows;
+    const res = await client.query("SELECT id, name FROM specialties");
+    return res.rows;
   } catch (err) {
-      console.error("Ошибка получения специальностей:", err);
-      return [];
+    console.error("Ошибка получения специальностей:", err);
+    return [];
   }
 });
+
 ipcMain.handle("add-students", async (event, students) => {
   try {
-      const query = `
+    const query = `
           INSERT INTO students (first_name, last_name, middle_name, group_id, specialty_id)
           VALUES ($1, $2, $3, $4, $5)
       `;
 
-      for (const student of students) {
-          await client.query(query, [
-              student.first_name, 
-              student.last_name,  
-              student.middle_name || null, 
-              student.group_id,
-              student.specialty_id,
-          ]);
-      }
+    for (const student of students) {
+      await client.query(query, [
+        student.first_name,
+        student.last_name,
+        student.middle_name || null,
+        student.group_id,
+        student.specialty_id,
+      ]);
+    }
 
-      return { success: true };
+    return { success: true };
   } catch (err) {
-      console.error("Ошибка добавления студентов:", err);
-      return { success: false, error: err.message };
+    console.error("Ошибка добавления студентов:", err);
+    return { success: false, error: err.message };
   }
 });
 
 ipcMain.handle("get-students-by-group", async (_, groupId) => {
   try {
     const res = await client.query(`
-      SELECT id, CONCAT(last_name, ' ', first_name, ' ', COALESCE(middle_name, '')) AS full_name 
-      FROM students WHERE group_id = $1
+      SELECT id, 
+             CONCAT(last_name, ' ', first_name, ' ', COALESCE(middle_name, '')) AS full_name,
+             specialty_id
+      FROM students 
+      WHERE group_id = $1
     `, [groupId]);
-    return res.rows; // [{ id: 1, full_name: 'Иванов Иван Иванович' }, ...]
+    return res.rows; // [{ id: 1, full_name: 'Иванов Иван Иванович', specialty_id: 1 }, ...]
   } catch (err) {
     console.error("Ошибка получения студентов:", err);
     return [];
@@ -213,46 +218,46 @@ ipcMain.handle("get-students-by-group-and-specialty", async (_, groupId, special
 
 ipcMain.handle("update-students", async (event, students) => {
   try {
-      const query = `
+    const query = `
           UPDATE students
           SET first_name = $1, last_name = $2, middle_name = $3, group_id = $4, specialty_id = $5
           WHERE id = $6
       `;
 
-      for (const student of students) {
-          await client.query(query, [
-              student.first_name,
-              student.last_name,
-              student.middle_name || null,
-              student.group_id,
-              student.specialty_id,
-              student.id,
-          ]);
-      }
+    for (const student of students) {
+      await client.query(query, [
+        student.first_name,
+        student.last_name,
+        student.middle_name || null,
+        student.group_id,
+        student.specialty_id,
+        student.id,
+      ]);
+    }
 
-      return { success: true };
+    return { success: true };
   } catch (err) {
-      console.error("Ошибка обновления студентов:", err);
-      return { success: false, error: err.message };
+    console.error("Ошибка обновления студентов:", err);
+    return { success: false, error: err.message };
   }
 });
 
 
 ipcMain.handle("delete-students", async (event, students) => {
   try {
-      const query = `
+    const query = `
           DELETE FROM students
           WHERE id = $1
       `;
 
-      for (const student of students) {
-          await client.query(query, [student.id]);
-      }
+    for (const student of students) {
+      await client.query(query, [student.id]);
+    }
 
-      return { success: true };
+    return { success: true };
   } catch (err) {
-      console.error("Ошибка удаления студентов:", err);
-      return { success: false, error: err.message };
+    console.error("Ошибка удаления студентов:", err);
+    return { success: false, error: err.message };
   }
 });
 
@@ -265,7 +270,7 @@ ipcMain.handle("get-wasm-path", () => {
 });
 
 
-app.whenReady().then(async() => {
+app.whenReady().then(async () => {
   await setupDatabase();
 
   const menuTemplate = [
@@ -278,7 +283,7 @@ app.whenReady().then(async() => {
       ],
     },
   ];
-  
+
   const menu = Menu.buildFromTemplate(menuTemplate);
 
   Menu.setApplicationMenu(menu);

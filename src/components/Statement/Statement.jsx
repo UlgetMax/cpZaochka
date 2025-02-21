@@ -139,20 +139,6 @@ export default function Statement() {
                             ))}
                         </select>
 
-{/* 
-                        {filteredItems.length > 0 && (
-                            <ul className={styles.dropdownList}>
-                                {filteredItems.map((item) => (
-                                    <li
-                                        key={item.id}
-                                        className={styles.dropdownItem}
-                                        onClick={() => handleItemClick(item)}
-                                    >
-                                        {item.name}
-                                    </li>
-                                ))}
-                            </ul>
-                        )} */}
                     </div>
 
                     <div className={styles.statement__wrapper__curs}>

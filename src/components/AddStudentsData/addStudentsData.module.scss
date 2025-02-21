@@ -1,154 +1,150 @@
 .addStudents {
-    margin-top: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  // min-height: 100vh;
+  // padding: 30px 20px 0 20px;
+
+  .addStudents__header {
     display: flex;
-    flex-direction: column;
-    width: 100%;
-    // min-height: 100vh;
-    // padding: 30px 20px 0 20px;
+    align-items: center;
+    margin-bottom: 40px;
 
-    .addStudents__header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 40px;
+    .addStudents__header__img {
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 20%;
+      transition: 0.2s ease-in;
 
-        .addStudents__header__img {
-            cursor: pointer;
-            padding: 6px;
-            border-radius: 20%;
-            transition: 0.2s ease-in;
-
-            .addStudents__header__arrow {
-                flex-shrink: 0;
-                width: 24px;
-                height: 24px;
-            }
-            
-            &:hover {
-                background-color: #555555;
-            }
-        }
-
-        h1 {
-            flex-grow: 1;
-            font-size: 20px;
-            text-align: center;
-        }
-    }
-
-    .addStudents__wrapper {
-      position: relative;
-      padding-bottom: 30px;
-
-      .addStudents__wrapper__input {
-        display: flex;
-        gap: 40px;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #3d3d3d;
-
-
-        .addStudents__wrapper__input__group {
-          padding: 10px 5px;
-          background-color: #5b5b5b;
-          width: 150px;
-        }
-  
-        .addStudents__wrapper__input__specialties {
-          padding: 10px 5px;
-          background-color: #5b5b5b;
-          width: 300px;
-        }
+      .addStudents__header__arrow {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
       }
 
-      .addStudents__wrapper__buttons {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-        gap: 20px;
+      &:hover {
+        background-color: #555555;
+      }
+    }
 
-        input[type="file"] {
-          padding: 10px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
+    h1 {
+      flex-grow: 1;
+      font-size: 20px;
+      text-align: center;
+    }
+  }
+
+  .addStudents__wrapper {
+    position: relative;
+    padding-bottom: 30px;
+
+    .addStudents__wrapper__input {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #3d3d3d;
+
+      .addStudents__wrapper__input__group {
+        padding: 10px 5px;
+        background-color: #5b5b5b;
+        width: 150px;
+      }
+
+      .addStudents__wrapper__input__specialties {
+        padding: 10px 5px;
+        background-color: #5b5b5b;
+        width: 300px;
+      }
+    }
+
+    .addStudents__wrapper__buttons {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 20px;
+
+      input[type="file"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
         //   background-color: #f9f9f9;
-          cursor: pointer;
-          transition: 0.2s ease-in;
-    
-          &:hover {
-            background-color: #262626;
-          }
-        }
+        cursor: pointer;
+        transition: 0.2s ease-in;
 
-        button {
-          padding: 10px 5px;
-          background-color: #5b5b5b;
-          border-radius: 5px;
-          width: 150px;
-        }
-      }
-      
-      .addStudents__wrapper__table {
-        max-height: 430px; 
-        overflow-y: auto; 
-        border-top: 1px solid #ccc; 
-        border-bottom: 1px solid #ccc; 
-
-
-        .studentsTable {
-          width: 100%;
-          border-collapse: collapse;
-    
-          th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-          }
-    
-          th {
-            background-color: #5b5b5b;
-            color: white;
-            font-weight: bold;
-          }
-    
-          tr:nth-child(even) {
-            background-color: #181818;
-          }
-    
-          tr:hover {
-            background-color: #2a2a2a;
-          }
+        &:hover {
+          background-color: #262626;
         }
       }
 
-      .addStudents__wrapper__editButtons {
-        position: absolute;
-        // bottom: 0; /* Центрируем по вертикали */
-        left: 50%; /* Центрируем по горизонтали */
-        transform: translate(-50%); 
-        margin-top: 20px;
-        display: flex;
-        gap: 25px;
-
-        .addStudents__wrapper__editButtons__save {
-          background-color: #2373f3;
-          color: #fff;
-          padding: 10px 5px;
-          border-radius: 5px;
-          width: 250px;
-          font-weight: 500;
-
-        }
-
-        .addStudents__wrapper__editButtons__delete {
-          background-color: #be2e2e;
-          color: #fff;
-          padding: 10px 5px;
-          border-radius: 5px;
-          width: 150px;
-          font-weight: 500;
-        }
+      button {
+        padding: 10px 5px;
+        background-color: #5b5b5b;
+        border-radius: 5px;
+        width: 150px;
       }
-      
     }
-    
+
+    .addStudents__wrapper__table {
+      max-height: 430px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+
+      .studentsTable {
+        width: 100%;
+        border-collapse: collapse;
+
+        th,
+        td {
+          padding: 12px;
+          border: 1px solid #ddd;
+          text-align: left;
+        }
+
+        th {
+          background-color: #5b5b5b;
+          color: white;
+          font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+          background-color: #181818;
+        }
+
+        tr:hover {
+          background-color: #2a2a2a;
+        }
+      }
+    }
+
+    .addStudents__wrapper__editButtons {
+      position: absolute;
+      // bottom: 0; /* Центрируем по вертикали */
+      left: 50%; /* Центрируем по горизонтали */
+      transform: translate(-50%);
+      margin-top: 20px;
+      display: flex;
+      gap: 25px;
+
+      .addStudents__wrapper__editButtons__save {
+        background-color: #2373f3;
+        color: #fff;
+        padding: 10px 5px;
+        border-radius: 5px;
+        width: 250px;
+        font-weight: 500;
+      }
+
+      .addStudents__wrapper__editButtons__delete {
+        background-color: #be2e2e;
+        color: #fff;
+        padding: 10px 5px;
+        border-radius: 5px;
+        width: 150px;
+        font-weight: 500;
+      }
+    }
+  }
 }
