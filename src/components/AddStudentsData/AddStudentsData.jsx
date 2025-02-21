@@ -3,9 +3,7 @@ import styles from "./addStudentsData.module.scss";
 import { useNavigate } from "react-router-dom";
 import { DOMParser } from "@xmldom/xmldom";
 import PizZip from "pizzip";
-// import { generateDocx } from "./generateDocx__addStudents";
 
-import Arrow from "../../img/svg/Arrow.svg";
 
 export default function AddStudentsData() {
 

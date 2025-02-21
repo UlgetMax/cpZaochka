@@ -40,18 +40,18 @@ export default function Statement() {
         }
     }, [searchTerm, groups]);
 
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
-    };
-
     const handleItemClick = (group) => {
+        if (!group) {
+            setSelectedGroup(null);
+            setCourse(""); 
+            setStudents([]);
+            return;
+        }
+    
         setSelectedGroup(group);
-        setSearchTerm(group.name);
-        setFilteredItems([]);
-
+    
         window.electron.getStudentsByGroup(group.id).then((data) => {
             setStudents(data);
-
             const updatedEditedStudents = {};
             data.forEach(student => {
                 updatedEditedStudents[student.id] = student.full_name;
@@ -59,6 +59,8 @@ export default function Statement() {
             setEditedStudents(updatedEditedStudents);
         });
     };
+    
+    
 
     
 
@@ -94,6 +96,8 @@ export default function Statement() {
         generateDocx(course, semester, selectedGroup?.name || "Не выбрано", formattedStudents, "ПОиТ", predmet, "Панасюк Наталья");
     };
     
+
+    
     
 
 
@@ -119,14 +123,23 @@ export default function Statement() {
 
                 <div className={styles.statement__wrapper__Row}>
                     <div className={styles.statement__wrapper__group}>
-                        <input
-                            className={styles.statement__wrapper__groupInput}
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)} 
-                            placeholder="Выберите учебную группу"
-                        />
+                        <select
+                            className={styles.statement__wrapper__groupSelect}
+                            value={selectedGroup?.id || ""}
+                            onChange={(e) => {
+                                const groupId = e.target.value ? parseInt(e.target.value) : null;
+                                const group = groups.find(g => g.id === groupId);
+                                handleItemClick(group);
+                            }}
+                        >
 
+                            <option value="">Выберите учебную группу</option>
+                            {groups.map(group => (
+                                <option key={group.id} value={group.id}>{group.name}</option>
+                            ))}
+                        </select>
+
+{/* 
                         {filteredItems.length > 0 && (
                             <ul className={styles.dropdownList}>
                                 {filteredItems.map((item) => (
@@ -139,7 +152,7 @@ export default function Statement() {
                                     </li>
                                 ))}
                             </ul>
-                        )}
+                        )} */}
                     </div>
 
                     <div className={styles.statement__wrapper__curs}>
