@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./diplomSupplement.module.scss";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 import { generateDocx__DiplomSupplement } from "./generateDocx__DiplomSupplement";
 
 
@@ -15,7 +15,7 @@ export default function DiplomSupplement() {
     const [selectedSpecialty, setSelectedSpecialty] = useState("");
     const [selectedStudents, setSelectedStudents] = useState(new Set());
     const [isEditing, setIsEditing] = useState({});
-    const [grades, setGrades] = useState({}); 
+    const [grades, setGrades] = useState({});
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [students, setStudents] = useState([]);
     const [course, setCourse] = useState("");
@@ -32,13 +32,29 @@ export default function DiplomSupplement() {
         }
     }, []);
 
+    const handlePrintDocx = () => {
+        const tablesData = tables.map((table) => ({
+            group: table.group?.name || "—",
+            specialization: table.specialization || "—",
+            predmet: table.predmet,
+            teacher: table.teacher,
+            students: table.students.map((student) => ({
+                full_name: student.full_name,
+                semestrGrades: student.grades?.semestrGrades || "—",
+                diplomGrade: student.grades?.diplomGrade || "—",
+            })),
+        }));
+
+        generateDocx__DiplomSupplement(tablesData);
+    };
+
     const addTable = () => {
         const newTable = {
             id: Date.now(),
             predmet: predmet,
             teacher: teacher,
             students: students,
-            grades: grades,
+            grades: {...grades}
         };
         setTables([...tables, newTable]);
         setPredmet("");
@@ -56,22 +72,22 @@ export default function DiplomSupplement() {
     const handleItemClick = (group) => {
         if (!group) {
             setSelectedGroup(null);
-            setCourse(""); 
+            setCourse("");
             setStudents([]);
             return;
         }
-    
+
         setSelectedGroup(group);
-    
+
         window.electron.getStudentsByGroup(group.id).then((data) => {
             setStudents(data.map(student => ({
                 ...student,
                 group_name: group.name,
-                specialty_name: student.specialty_id 
+                specialty_name: student.specialty_id
                     ? (specialties.find(spec => spec.id === student.specialty_id)?.name || "—")
                     : "—",
             })));
-    
+
             const updatedGrades = {};
             data.forEach(student => {
                 updatedGrades[student.id] = { semestrGrades: "", diplomGrade: "" };
@@ -79,20 +95,20 @@ export default function DiplomSupplement() {
             setGrades(updatedGrades);
         });
     };
-    
-    
-    
-    
+
+
+
+
     const handleGradeChange = (id, field, value) => {
         setGrades(prev => ({
             ...prev,
             [id]: {
                 ...prev[id],
-                [field]: value
-            }
+                [field]: value, 
+            },
         }));
     };
-    
+
 
     const handleEditChange = (id, field, value) => {
         setStudents(prev =>
@@ -110,42 +126,42 @@ export default function DiplomSupplement() {
             )
         );
     };
-    
+
     const handleDeleteTable = (tableId) => {
         setTables(prevTables => prevTables.filter(table => table.id !== tableId));
     };
 
     const handleEdit = (tableId, studentId, field, value) => {
-        setTables((prevTables) =>
-            prevTables.map((table) =>
-                table.id === tableId
-                    ? {
-                          ...table,
-                          students: table.students.map((student) =>
-                              student.id === studentId
-                                  ? { ...student, [field]: value }
-                                  : student
-                          ),
-                      }
-                    : table
+        setTables(prevTables =>
+            prevTables.map(table =>
+                table.id === tableId ? {
+                    ...table,
+                    grades: {
+                        ...table.grades,
+                        [studentId]: {
+                            ...table.grades[studentId],
+                            [field]: value
+                        }
+                    }
+                } : table
             )
         );
     };
-    
+
     const handleDelete = (tableId, studentId) => {
         setTables(prevTables =>
             prevTables.map(table =>
                 table.id === tableId
                     ? {
-                          ...table,
-                          students: table.students.filter(student => student.id !== studentId),
-                          grades: Object.keys(table.grades).reduce((acc, key) => {
-                              if (key !== studentId.toString()) {
-                                  acc[key] = table.grades[key];
-                              }
-                              return acc;
-                          }, {}),
-                      }
+                        ...table,
+                        students: table.students.filter(student => student.id !== studentId),
+                        grades: Object.keys(table.grades).reduce((acc, key) => {
+                            if (key !== studentId.toString()) {
+                                acc[key] = table.grades[key];
+                            }
+                            return acc;
+                        }, {}),
+                    }
                     : table
             )
         );
@@ -172,6 +188,55 @@ export default function DiplomSupplement() {
         setStudents(prev => prev.filter(student => student.id !== id));
     };
 
+
+    const numberToText = (num) => {
+        const gradesMap = {
+            1: "один",
+            2: "два",
+            3: "три",
+            4: "четыре",
+            5: "пять",
+            6: "шесть",
+            7: "семь",
+            8: "восемь",
+            9: "девять",
+            10: "десять",
+        };
+        return gradesMap[num] ? `${num} (${gradesMap[num]})` : num;
+    };
+
+    const validateSemestrGrades = (input) => {
+        const numbers = input
+            .split(" ")
+            .map((num) => parseInt(num))
+            .filter((num) => num >= 1 && num <= 10);
+
+        return numbers.join(" ");
+    };
+
+    const validateGrades = (input) => {
+        const numbers = input
+            .split(" ")
+            .map((num) => parseInt(num))
+            .filter((num) => num >= 1 && num <= 10);
+
+        return numbers.length > 0 ? numbers[0].toString() : "";
+    };
+
+
+
+    const validateInputOnFly = (input, isSemestrGrades = true) => {
+        if (isSemestrGrades) {
+          // Для оценок за семестры разрешаем цифры и пробелы
+          return input.replace(/[^0-9\s]/g, "");
+        } else {
+          // Для отметки к диплому разрешаем только цифры
+          return input.replace(/[^0-9]/g, "");
+        }
+      };
+
+    
+    
 
 
     return (
@@ -224,7 +289,7 @@ export default function DiplomSupplement() {
                     </select>
 
 
-
+                    {/* 
                     <select
                         className={styles.rowSelect__groupSelect}
                         value={selectedSpecialty}
@@ -236,7 +301,7 @@ export default function DiplomSupplement() {
                         {specialties.map(spec => (
                             <option key={spec.id} value={spec.id}>{spec.name}</option>
                         ))}
-                    </select>
+                    </select> */}
 
 
                     <button onClick={addTable}>Добавить таблицу</button>
@@ -322,20 +387,41 @@ export default function DiplomSupplement() {
                                             )}
                                         </td>
                                         <td>
-                                            <input
-                                                type="text"
-                                                value={grades[student.id]?.semestrGrades || ""}
-                                                onChange={(e) => handleGradeChange(student.id, "semestrGrades", e.target.value)}
-                                                placeholder="4 (четыре) 6 (шесть)"
-                                            />
+                                            {isEditing[student.id] ? (
+                                                <input
+                                                    type="text"
+                                                    value={grades[student.id]?.semestrGrades || ""}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+
+                                                        const validatedValue = validateInputOnFly(value, true);
+                                                        handleGradeChange(student.id, "semestrGrades", validatedValue);
+                                                    }}
+                                                    placeholder="Оценки через пробел"
+                                                />
+                                            ) : (
+                                                grades[student.id]?.semestrGrades
+                                                    ?.split(" ")
+                                                    .map((num) => numberToText(num))
+                                                    .join(", ") || "—"
+                                            )}
                                         </td>
                                         <td>
-                                            <input
-                                                type="text"
-                                                value={grades[student.id]?.diplomGrade || ""}
-                                                onChange={(e) => handleGradeChange(student.id, "diplomGrade", e.target.value)}
-                                                placeholder="4 (четыре)"
-                                            />
+                                            {isEditing[student.id] ? (
+                                                <input
+                                                    type="text"
+                                                    value={grades[student.id]?.diplomGrade || ""}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                      
+                                                        const validatedValue = validateInputOnFly(value, false);
+                                                        handleGradeChange(student.id, "diplomGrade", validatedValue);
+                                                    }}
+                                                    placeholder="Итоговая оценка"
+                                                />
+                                            ) : (
+                                                numberToText(grades[student.id]?.diplomGrade) || "—"
+                                            )}
                                         </td>
                                         <td>
                                             <button onClick={() => toggleEdit(student.id)}>✏️</button>
@@ -348,30 +434,49 @@ export default function DiplomSupplement() {
                     </div>
                 )}
 
-                
-                {tables.map((table) => (
-                    <TableComponent
-                        key={table.id}
-                        table={table}
-                        onEdit={handleEdit}
-                        onDelete={handleDelete}
-                        onEditTable={handleEditTable} 
-                        onDeleteTable={handleDeleteTable}
-                    />
-                ))}
+                <div className={styles.supplement__tableWrapperAdd__add}>
+                    {tables.map((table) => (
+                        <TableComponent
+                            key={table.id}
+                            table={table}
+                            onEdit={handleEdit}
+                            onDelete={handleDelete}
+                            onEditTable={handleEditTable}
+                            onDeleteTable={handleDeleteTable}
+                            numberToText={numberToText} 
+                            validateGrades={validateGrades}
+                            validateSemestrGrades={validateSemestrGrades}
+                            validateInputOnFly={validateInputOnFly}
+                        />
+                    ))}
+                </div>
 
+                
             </div>
 
+            <div className={styles.supplement__footer}>
+                <button onClick={handlePrintDocx}>Печатать DOCX</button>
+            </div>
         </div>
     )
-} 
+}
 
 
-const TableComponent = ({ table, onEdit, onDelete, onEditTable, onDeleteTable }) => {
+const TableComponent = ({
+    table,
+    onEdit,
+    onDelete,
+    onEditTable,
+    onDeleteTable,
+    numberToText,
+    validateGrades,
+    validateSemestrGrades,
+    validateInputOnFly, 
+}) => {
     const [isEditingTable, setIsEditingTable] = useState(false);
     const [editedPredmet, setEditedPredmet] = useState(table.predmet);
     const [editedTeacher, setEditedTeacher] = useState(table.teacher);
-    const [isEditingRow, setIsEditingRow] = useState({}); 
+    const [isEditingRow, setIsEditingRow] = useState({});
 
     const handleSave = () => {
         onEditTable(table.id, editedPredmet, editedTeacher);
@@ -379,8 +484,17 @@ const TableComponent = ({ table, onEdit, onDelete, onEditTable, onDeleteTable })
     };
 
     const handleEditRow = (studentId, field, value) => {
+        if (field === "semestrGrades") {
+          if (!isEditingRow[studentId]) {
+            value = validateSemestrGrades(value); 
+          }
+        } else if (field === "diplomGrade") {
+          if (!isEditingRow[studentId]) {
+            value = validateGrades(value); 
+          }
+        }
         onEdit(table.id, studentId, field, value);
-    };
+      };
 
     const toggleEditRow = (studentId) => {
         setIsEditingRow((prev) => ({
@@ -390,9 +504,9 @@ const TableComponent = ({ table, onEdit, onDelete, onEditTable, onDeleteTable })
     };
 
     return (
-        <div className={styles.supplement__tableWrapper}>
+        <div className={styles.supplement__tableWrapperAdd}>
             {isEditingTable ? (
-                <div>
+                <div className={styles.supplement__tableWrapperAdd__input}>
                     <input
                         type="text"
                         value={editedPredmet}
@@ -408,11 +522,15 @@ const TableComponent = ({ table, onEdit, onDelete, onEditTable, onDeleteTable })
                     <button onClick={handleSave}>Сохранить</button>
                 </div>
             ) : (
-                <div>
-                    <h3>Учебный предмет: {table.predmet}</h3>
-                    <h3>Преподаватель: {table.teacher}</h3>
-                    <button onClick={() => setIsEditingTable(true)}>✏️</button>
-                    <button onClick={() => onDeleteTable(table.id)}>Удалить таблицу</button>
+                <div className={styles.supplement__tableWrapperAdd__button}>
+                    <span>
+                        <h3>Учебный предмет: {table.predmet}</h3>
+                        <h3>Преподаватель: {table.teacher}</h3>
+                    </span>
+                    <span className={styles.tableWrapperAdd__button}>
+                        <button onClick={() => setIsEditingTable(true)}>Редактировать</button>
+                        <button onClick={() => onDeleteTable(table.id)}>Удалить таблицу</button>
+                    </span>
                 </div>
             )}
 
@@ -466,20 +584,41 @@ const TableComponent = ({ table, onEdit, onDelete, onEditTable, onDeleteTable })
                                 )}
                             </td>
                             <td>
-                                <input
-                                    type="text"
-                                    value={table.grades[student.id]?.semestrGrades || ""}
-                                    onChange={(e) => onEdit(table.id, student.id, "semestrGrades", e.target.value)}
-                                    placeholder="4 (четыре) 6 (шесть)"
-                                />
+                                {isEditingRow[student.id] ? (
+                                    <input
+                                        type="text"
+                                        value={table.grades[student.id]?.["semestrGrades"] || ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            
+                                            const validatedValue = validateInputOnFly(value, true);
+                                            handleEditRow(student.id, "semestrGrades", validatedValue);
+                                        }}
+                                        placeholder="Оценки через пробел"
+                                    />
+                                ) : (
+                                    table.grades[student.id]?.semestrGrades
+                                        ?.split(" ")
+                                        .map(num => numberToText(num))
+                                        .join(", ") || "—"
+                                )}
                             </td>
                             <td>
-                                <input
-                                    type="text"
-                                    value={table.grades[student.id]?.diplomGrade || ""}
-                                    onChange={(e) => onEdit(table.id, student.id, "diplomGrade", e.target.value)}
-                                    placeholder="4 (четыре)"
-                                />
+                                {isEditingRow[student.id] ? (
+                                    <input
+                                        type="text"
+                                        value={table.grades[student.id]?.["diplomGrade"] || ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                         
+                                            const validatedValue = validateInputOnFly(value, false);
+                                            handleEditRow(student.id, "diplomGrade", validatedValue);
+                                        }}
+                                        placeholder="Итоговая оценка"
+                                    />
+                                ) : (
+                                    numberToText(table.grades[student.id]?.diplomGrade) || "—"
+                                )}
                             </td>
                             <td>
                                 <button onClick={() => onDelete(table.id, student.id)}>❌</button>

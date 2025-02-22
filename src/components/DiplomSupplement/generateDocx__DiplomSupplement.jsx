@@ -1,9 +1,7 @@
-import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType } from "docx";
+import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType, AlignmentType, PageBreak } from "docx";
 import { saveAs } from "file-saver";
 
-export function generateDocx__DiplomSupplement(group, students, specialization, predmet, teacher) {
-
-
+export function generateDocx__DiplomSupplement(tables) {
     const doc = new Document({
         styles: {
             default: {
@@ -18,7 +16,11 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
         sections: [
             {
                 properties: {},
-                children: [
+                children: tables.flatMap((table, index) => [
+                    // Добавляем разрыв страницы перед каждой таблицей, кроме первой
+                    ...(index > 0 ? [new Paragraph({ children: [new PageBreak()] })] : []),
+
+                    // Заголовок для каждой таблицы
                     new Paragraph({
                         alignment: AlignmentType.CENTER,
                         children: [
@@ -26,7 +28,7 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                                 text: "Частное учреждение образования",
                                 bold: true,
                                 underline: {},
-                                size: 32, 
+                                size: 32,
                             }),
                         ],
                     }),
@@ -34,11 +36,10 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                         alignment: AlignmentType.CENTER,
                         children: [
                             new TextRun({
-                                text: "«Колледж бизнеса и права» Брестсикй филиал",
+                                text: "«Колледж бизнеса и права» Брестский филиал",
                                 bold: true,
                                 underline: {},
                                 size: 32,
-
                             }),
                         ],
                     }),
@@ -48,7 +49,6 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                             new TextRun({
                                 text: "(наименование учебного заведения)",
                                 size: 24,
-        
                             }),
                         ],
                     }),
@@ -62,26 +62,24 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                                 text: "В Е Д О М О С Т Ь",
                                 bold: true,
                                 size: 56,
-                     
                             }),
                         ],
                     }),
 
                     new Paragraph({}),
 
-                    new Paragraph ({
+                    new Paragraph({
                         alignment: AlignmentType.LEFT,
                         children: [
                             new TextRun({
-                                text: `отметок успеваемости учащихся группы № ${group}`,
+                                text: `отметок успеваемости учащихся группы № ${table.group}`,
                                 size: 28,
-
                             }),
                             new TextRun({
-                                text: `(для занесения в приложение к диплому)`, 
+                                text: `(для занесения в приложение к диплому)`,
                                 size: 28,
                             }),
-                        ]
+                        ],
                     }),
 
                     new Paragraph({}),
@@ -91,33 +89,23 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                         children: [
                             new TextRun({
                                 text: "Специальность ",
-                    
                             }),
                             new TextRun({
-                                text: `      ${specialization}      `, 
-                                underline: {}, 
+                                text: `      ${table.specialization}      `,
+                                underline: {},
                             }),
-
-                            new TextRun({
-                                text: "",
-                            }),
-
-                            
-                            
                         ],
                     }),
 
-                    
                     new Paragraph({
                         alignment: AlignmentType.LEFT,
                         children: [
                             new TextRun({
                                 text: "Наименование учебной дисциплины ",
                             }),
-
                             new TextRun({
-                                text: `      ${predmet}      `, 
-                                underline: {}, 
+                                text: `      ${table.predmet}      `,
+                                underline: {},
                             }),
                         ],
                     }),
@@ -127,16 +115,16 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                             new TextRun({
                                 text: "Преподаватель ",
                             }),
-
                             new TextRun({
-                                text: `      ${teacher}      `, 
-                                underline: {}, 
+                                text: `      ${table.teacher}      `,
+                                underline: {},
                             }),
                         ],
                     }),
 
                     new Paragraph({}),
 
+                    // Таблица с данными
                     new Table({
                         width: { size: 100, type: WidthType.PERCENTAGE },
                         rows: [
@@ -144,25 +132,25 @@ export function generateDocx__DiplomSupplement(group, students, specialization, 
                                 children: [
                                     new TableCell({ children: [headerText("№ п/п")] }),
                                     new TableCell({ children: [headerText("Ф. И. О. учащегося")] }),
-                                    new TableCell({ children: [headerText("Отметказа каждый семестр")] }),
+                                    new TableCell({ children: [headerText("Отметка за каждый семестр")] }),
                                     new TableCell({ children: [headerText("Отметка к диплому")] }),
                                     new TableCell({ children: [headerText("Подпись преподавателя")] }),
                                 ],
                             }),
-                            ...students.map((student, index) =>
+                            ...table.students.map((student, index) =>
                                 new TableRow({
                                     children: [
                                         new TableCell({ children: [cellText(index + 1)] }),
-                                        new TableCell({ children: [cellText(student.name)] }), 
-                                        new TableCell({ children: [cellText("оценка за каждый семестр")] }), //Здесь должно быть по 2 оценки такого формата 4 (четыре) 6 (шесть)
-                                        new TableCell({ children: [cellText("отметка к диплому")] }), // здесь одна оценка формат 4 (четыре)
-                                        new TableCell({ children: [cellText("")] }),
+                                        new TableCell({ children: [cellText(student.full_name)] }),
+                                        new TableCell({ children: [cellText(student.semestrGrades)] }), // Оценки за семестры
+                                        new TableCell({ children: [cellText(student.diplomGrade)] }), // Отметка к диплому
+                                        new TableCell({ children: [cellText("")] }), // Подпись преподавателя
                                     ],
                                 })
                             ),
                         ],
                     }),
-                ],
+                ]),
             },
         ],
     });
