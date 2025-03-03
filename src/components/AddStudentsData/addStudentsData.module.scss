@@ -1,3 +1,5 @@
+@use "../../styles/globalStyles" as *;
+
 .addStudents {
   margin-top: 20px;
   display: flex;
@@ -5,35 +7,6 @@
   width: 100%;
   // min-height: 100vh;
   // padding: 30px 20px 0 20px;
-
-  .addStudents__header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 40px;
-
-    .addStudents__header__img {
-      cursor: pointer;
-      padding: 6px;
-      border-radius: 20%;
-      transition: 0.2s ease-in;
-
-      .addStudents__header__arrow {
-        flex-shrink: 0;
-        width: 24px;
-        height: 24px;
-      }
-
-      &:hover {
-        background-color: #555555;
-      }
-    }
-
-    h1 {
-      flex-grow: 1;
-      font-size: 20px;
-      text-align: center;
-    }
-  }
 
   .addStudents__wrapper {
     position: relative;
@@ -44,18 +17,20 @@
       gap: 40px;
       margin-bottom: 20px;
       padding-bottom: 10px;
-      border-bottom: 2px solid #3d3d3d;
+      border-bottom: 1px solid $border-color;
 
-      .addStudents__wrapper__input__group {
-        padding: 10px 5px;
-        background-color: #5b5b5b;
+      .addStudents__wrapper__select__group {
+        @include select-style;
         width: 150px;
       }
 
-      .addStudents__wrapper__input__specialties {
-        padding: 10px 5px;
-        background-color: #5b5b5b;
+      .addStudents__wrapper__select__specialties {
+        @include select-style;
         width: 300px;
+      }
+
+      .addStudents__wrapper__btn {
+        @include select-style;
       }
     }
 
@@ -67,21 +42,26 @@
 
       input[type="file"] {
         padding: 10px;
-        border: 1px solid #ccc;
+        border: 1px solid $border-color;
         border-radius: 4px;
-        //   background-color: #f9f9f9;
+        // background-color: #f9f9f9;
+        color: $background-color;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
         transition: 0.2s ease-in;
 
         &:hover {
-          background-color: #262626;
+          background-color: $background-color;
+          color: $light-text-colot;
         }
       }
 
       button {
-        padding: 10px 5px;
-        background-color: #5b5b5b;
-        border-radius: 5px;
+        // padding: 10px 5px;
+        // background-color: #5b5b5b;
+        // border-radius: 5px;
+        @include button-sub-style;
         width: 150px;
       }
     }
@@ -93,29 +73,30 @@
       border-bottom: 1px solid #ccc;
 
       .studentsTable {
-        width: 100%;
-        border-collapse: collapse;
+        @extend .table;
+        // width: 100%;
+        // border-collapse: collapse;
 
-        th,
-        td {
-          padding: 12px;
-          border: 1px solid #ddd;
-          text-align: left;
-        }
+        // th,
+        // td {
+        //   padding: 12px;
+        //   border: 1px solid #ddd;
+        //   text-align: left;
+        // }
 
-        th {
-          background-color: #5b5b5b;
-          color: white;
-          font-weight: bold;
-        }
+        // th {
+        //   background-color: #5b5b5b;
+        //   color: white;
+        //   font-weight: bold;
+        // }
 
-        tr:nth-child(even) {
-          background-color: #181818;
-        }
+        // tr:nth-child(even) {
+        //   background-color: #181818;
+        // }
 
-        tr:hover {
-          background-color: #2a2a2a;
-        }
+        // tr:hover {
+        //   background-color: #2a2a2a;
+        // }
       }
     }
 

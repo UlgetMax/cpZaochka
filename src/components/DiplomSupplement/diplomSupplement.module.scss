@@ -1,3 +1,5 @@
+@use "../../styles/globalStyles" as *;
+
 .supplement {
   position: relative;
   display: flex;
@@ -14,6 +16,7 @@
     .supplement__header__img {
       cursor: pointer;
       padding: 6px;
+      color: $svg-color;
 
       border-radius: 20%;
       transition: 0.2s ease-in;
@@ -24,13 +27,13 @@
         height: 24px;
       }
       &:hover {
-        background-color: #555555;
+        background-color: $background-color;
+        color: $light-text-colot;
       }
     }
     h1 {
       flex-grow: 1;
-      font-size: 20px;
-      text-align: center;
+      @include titleText;
     }
   }
 
@@ -44,7 +47,10 @@
       margin: 0px 0 15px 0;
 
       .rowInput__classInput {
-        padding: 10px 5px;
+        // padding: 10px 5px;
+        // border-radius: 4px;
+        @include input-style;
+        width: 350px;
         border-radius: 4px;
       }
     }
@@ -58,10 +64,11 @@
       .rowSelect__groupSelect {
         padding: 10px 5px;
         border-radius: 4px;
+        @include select-style;
       }
 
       button {
-        padding: 10px 5px;
+        @include button-style;
         width: 150px;
         border-radius: 4px;
       }
@@ -70,34 +77,35 @@
     .supplement__tableWrapper {
       max-height: 430px;
       overflow-y: auto;
-      border-top: 1px solid #ccc;
-      border-bottom: 1px solid #ccc;
+      border-top: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
       margin-bottom: 20px;
 
       .supplement__table {
-        width: 100%;
-        border-collapse: collapse;
+        @extend .table;
+      //   width: 100%;
+      //   border-collapse: collapse;
 
-        th,
-        td {
-          padding: 12px;
-          border: 1px solid #ddd;
-          text-align: left;
-        }
+      //   th,
+      //   td {
+      //     padding: 12px;
+      //     border: 1px solid #ddd;
+      //     text-align: left;
+      //   }
 
-        th {
-          background-color: #5b5b5b;
-          color: white;
-          font-weight: bold;
-        }
+      //   th {
+      //     background-color: #5b5b5b;
+      //     color: white;
+      //     font-weight: bold;
+      //   }
 
-        tr:nth-child(even) {
-          background-color: #181818;
-        }
+      //   tr:nth-child(even) {
+      //     background-color: #181818;
+      //   }
 
-        tr:hover {
-          background-color: #2a2a2a;
-        }
+      //   tr:hover {
+      //     background-color: #2a2a2a;
+      //   }
       }
     }
 
@@ -105,10 +113,10 @@
       max-height: 500px;
       overflow-y: auto;
       border-bottom: 1px solid #ccc;
-      border-top: 1px solid #ccc;
       padding-top: 10px;
 
       .supplement__tableWrapperAdd {
+        border-top: 1px solid $border-color;
         max-height: 430px;
         overflow-y: auto;
         // border-top: 1px solid #ccc;
@@ -144,29 +152,30 @@
         }
 
         .supplement__table {
-          width: 100%;
-          border-collapse: collapse;
+          @extend .table;
+          // width: 100%;
+          // border-collapse: collapse;
 
-          th,
-          td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-          }
+          // th,
+          // td {
+          //   padding: 12px;
+          //   border: 1px solid #ddd;
+          //   text-align: left;
+          // }
 
-          th {
-            background-color: #5b5b5b;
-            color: white;
-            font-weight: bold;
-          }
+          // th {
+          //   background-color: #5b5b5b;
+          //   color: white;
+          //   font-weight: bold;
+          // }
 
-          tr:nth-child(even) {
-            background-color: #181818;
-          }
+          // tr:nth-child(even) {
+          //   background-color: #181818;
+          // }
 
-          tr:hover {
-            background-color: #2a2a2a;
-          }
+          // tr:hover {
+          //   background-color: #2a2a2a;
+          // }
         }
       }
     }

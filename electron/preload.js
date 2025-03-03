@@ -1,6 +1,8 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electron", {
+  send: (channel, data) => ipcRenderer.send(channel, data),
+  
   getWasmPath: () => ipcRenderer.invoke("get-wasm-path"),
   getUsers: () => ipcRenderer.invoke("get-users"),
   checkDbStatus: () => ipcRenderer.invoke("check-db"),

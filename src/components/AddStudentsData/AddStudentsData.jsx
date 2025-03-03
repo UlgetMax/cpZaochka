@@ -223,6 +223,7 @@ export default function AddStudentsData() {
 
                 <div className={styles.addStudents__wrapper__input}>
                     <select
+                        className = {styles.addStudents__wrapper__select__group}
                         value={selectedGroup}
                         onChange={(e) => {
                             setSelectedGroup(e.target.value);
@@ -236,6 +237,7 @@ export default function AddStudentsData() {
                     </select>
 
                     <select
+                        className = {styles.addStudents__wrapper__select__specialties}
                         value={selectedSpecialty}
                         onChange={(e) => {
                             setSelectedSpecialty(e.target.value);
@@ -249,12 +251,12 @@ export default function AddStudentsData() {
                     </select>
 
 
-                    <button onClick={handleFindStudents}>Найти учащихся</button>
+                    <button className={styles.addStudents__wrapper__btn} onClick={handleFindStudents}>Найти учащихся</button>
 
                 </div>
 
                 <div className={styles.addStudents__wrapper__buttons}>
-                    <input type="file" accept=".docx" onChange={handleFileUpload} />
+                    <input type="file" accept=".docx" onChange={handleFileUpload}/>
                     <button onClick={addStudentManually}>Добавить студента</button>
                     <button onClick={handleSave}>Сохранить</button>
                 </div>

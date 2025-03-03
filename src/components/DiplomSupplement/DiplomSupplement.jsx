@@ -258,7 +258,7 @@ export default function DiplomSupplement() {
                     <input
                         className={styles.rowInput__classInput}
                         type="text"
-                        placeholder="учебный предмет"
+                        placeholder="Учебный предмет"
                         onChange={(e) => setPredmet(e.target.value)}
                     />
 

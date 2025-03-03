@@ -1,22 +1,25 @@
+@use "../../styles/globalStyles" as *;
+
 .navPanel {
     width: 100%;
     display: flex;
     gap: 60px;
     padding-bottom: 20px;
-    border-bottom: 2px solid #3d3d3d;
+    border-bottom: 2px solid $border-color;
 
     button {
-        padding: 10px 5px;
-        background-color: rgb(205, 204, 204);
-        color: #000;
-        font-weight: 500;
-        font-size: 16px;
+        // padding: 10px 5px;
+        // background-color: rgb(205, 204, 204);
+        // color: #000;
+        // font-weight: 500;
+        // font-size: 16px;
         width: 150px;
-        border-radius: 5px;
-        transition: 0.2s ease-in;
+        // border-radius: 5px;
+        // transition: 0.2s ease-in;
 
-        &:hover {
-            background-color: rgb(148, 148, 148);
-        }
+        // &:hover {
+        //     background-color: rgb(148, 148, 148);
+        // }
+        @include button-sub-style;
     }
 }

@@ -2,6 +2,19 @@ cd D:\Storage_Programs\emsdk
 ./emsdk activate latest
 ./emsdk_env.ps1
 
+-- Чтобы скопилировать
+
+npm run build
+
+npx electron-builder
+
+--
+
+Чтобы скопилировать для win32:
+
+npm run build
+
+npx electron-builder --win --ia32
 
 emcc -v
 

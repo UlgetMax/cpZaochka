@@ -1,6 +1,9 @@
 const { app, BrowserWindow, ipcMain, screen, Menu } = require('electron');
 const path = require('path');
 const { Client } = require("pg");
+
+
+
 const isDev = process.env.NODE_ENV === 'development';
 
 
@@ -90,7 +93,8 @@ module.exports = {
 
 
 
-
+console.log("__dirname:", __dirname); // Папка, где находится main.js
+console.log("process.cwd():", process.cwd()); // Текущая рабочая директория (где запущен процесс)
 
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
@@ -100,7 +104,16 @@ async function createWindow() {
     // height: 800,
     width,
     height,
+    frame: false,
+    titleBarStyle: 'hidden', 
+    icon: path.join(__dirname, "assets/IconKitchen-Output/android/ic_college_Zaochka.ico"),
+    // resizable: false,
     // kiosk: true,
+    titleBarOverlay: {
+      color: '#242424', // Цвет заголовка 
+      symbolColor: '#ffffff', // Цвет кнопок закрытия/сворачивания
+      height: 40, // Высота панели
+    },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -118,6 +131,45 @@ async function createWindow() {
 
   win.webContents.openDevTools();
 }
+
+
+ipcMain.on("minimize-window", () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) win.minimize();
+});
+
+ipcMain.on("maximize-window", () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) {
+      if (win.isMaximized()) {
+          win.unmaximize();
+      } else {
+          win.maximize();
+      }
+  }
+});
+
+ipcMain.on("close-window", () => {
+  const win = BrowserWindow.getFocusedWindow();
+  if (win) win.close();
+});
+
+ipcMain.on("menu-action", (_, action) => {
+  switch (action) {
+      case "open":
+          console.log("Открытие файла...");
+          break;
+      case "edit":
+          console.log("Редактирование...");
+          break;
+      case "help":
+          console.log("Помощь...");
+          break;
+      default:
+          console.log("Неизвестное действие:", action);
+  }
+});
+
 
 
 //BD 
@@ -273,20 +325,6 @@ ipcMain.handle("get-wasm-path", () => {
 app.whenReady().then(async () => {
   await setupDatabase();
 
-  const menuTemplate = [
-    {
-      label: "Файл",
-      submenu: [
-        { label: "Открыть", click: () => console.log("Открыть файл") },
-        { type: "separator" },
-        { label: "Выход", role: "quit" },
-      ],
-    },
-  ];
-
-  const menu = Menu.buildFromTemplate(menuTemplate);
-
-  Menu.setApplicationMenu(menu);
   createWindow();
 
   app.on('activate', () => {
