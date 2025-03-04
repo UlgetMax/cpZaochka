@@ -93,9 +93,6 @@ module.exports = {
 
 
 
-console.log("__dirname:", __dirname); // Папка, где находится main.js
-console.log("process.cwd():", process.cwd()); // Текущая рабочая директория (где запущен процесс)
-
 async function createWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize;
   const win = new BrowserWindow({
@@ -104,8 +101,10 @@ async function createWindow() {
     // height: 800,
     width,
     height,
+    minWidth: width - 400,
+    minHeight: height - 200,
     frame: false,
-    titleBarStyle: 'hidden', 
+    // titleBarStyle: 'hidden', 
     icon: path.join(__dirname, "assets/IconKitchen-Output/android/ic_college_Zaochka.ico"),
     // resizable: false,
     // kiosk: true,

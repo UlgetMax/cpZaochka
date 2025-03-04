@@ -147,10 +147,18 @@ export default function AddStudentsData() {
             specialty_id: null,
         };
         setStudents(prev => [...prev, newStudent]);
+        setIsEditing(prev => ({ ...prev, [newStudent.id]: false }));
     };
 
     const handleEditChange = (id, field, value) => {
-        setStudents(prev => prev.map(student => student.id === id ? { ...student, [field]: value } : student));
+        setStudents(prev => 
+            prev.map(student => 
+                student.id === id ? { 
+                    ...student, 
+                    [field]: field.endsWith('_id') ? parseInt(value) || null : value 
+                } : student
+            )
+        );
     };
 
     const toggleSelectStudent = (id) => {
@@ -178,9 +186,9 @@ export default function AddStudentsData() {
             .then((data) => {
                 setStudents(data.map(student => ({
                     ...student,
-                    group_id: student.group_id,  // Сохраняем ID группы
-                    specialty_id: student.specialty_id,  // Сохраняем ID специальности
-                    group_name: student.group_name || "—",  // Используем правильные названия
+                    group_id: student.group_id,  
+                    specialty_id: student.specialty_id,  
+                    group_name: student.group_name || "—",  
                     specialty_name: student.specialty_name || "—"
                 })));
             })
