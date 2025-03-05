@@ -1,0 +1,48 @@
+@use "../../styles/globalStyles" as *;
+
+.addSpecializedData {
+    margin-top: 20px;
+
+
+    .addSpecialtyForm {
+        margin-bottom: 20px;
+        display: flex;
+        gap: 15px;
+
+        input {
+            @include input-style;
+            width: 350px;
+        }
+
+        button {
+            @include button-sub-style;
+            width: 150px;
+        }
+    }
+
+    .specialtiesTable {
+        width: 100%;
+        border-collapse: collapse;
+
+        @extend .table;
+        // th, td {
+        //     padding: 10px;
+        //     border: 1px solid #ddd;
+        //     text-align: left;
+        // }
+
+        // th {
+        //     background-color: #f2f2f2;
+        // }
+
+        // button {
+        //     padding: 5px 10px;
+        //     margin-right: 5px;
+        //     cursor: pointer;
+
+        //     &:hover {
+        //         opacity: 0.8;
+        //     }
+        // }
+    }
+}

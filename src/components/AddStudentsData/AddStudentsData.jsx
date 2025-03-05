@@ -5,6 +5,10 @@ import { DOMParser } from "@xmldom/xmldom";
 import PizZip from "pizzip";
 
 
+import Arrow from "../../img/svg/Arrow.svg";
+
+
+
 export default function AddStudentsData() {
 
     const [students, setStudents] = useState([]);
@@ -70,6 +74,13 @@ export default function AddStudentsData() {
 
     const handleSave = () => {
         if (students.length === 0) return;
+
+        const hasEmptyFields = students.some(student => !student.group_id || !student.specialty_id);
+
+        if (hasEmptyFields) {
+            alert("Убедитесь, что у всех студентов заполнены группа и специальность!");
+            return;
+        }
     
         window.electron.addStudents(students)
             .then((response) => {
@@ -77,6 +88,42 @@ export default function AddStudentsData() {
                     alert("Данные успешно сохранены!");
                     setStudents([]);
                     setSelectedStudents(new Set());
+                } else if (response.error === "Найдены одинаковое ФИО") {
+                   
+                    const duplicateNames = response.duplicates.map(s => 
+                        `${s.last_name} ${s.first_name} ${s.middle_name || ""}`
+                    ).join("\n");
+    
+                    const confirmSave = window.confirm(
+                        `Найдены дубликаты:\n${duplicateNames}\n\nХотите продолжить сохранение остальных студентов?`
+                    );
+    
+                    if (confirmSave) {
+                        
+                        const uniqueStudents = students.filter(student => 
+                            !response.duplicates.some(dup => 
+                                dup.first_name === student.first_name &&
+                                dup.last_name === student.last_name &&
+                                dup.middle_name === student.middle_name
+                            )
+                        );
+    
+                     
+                        window.electron.addStudents(uniqueStudents)
+                            .then((response) => {
+                                if (response.success) {
+                                    alert("Уникальные данные успешно сохранены!");
+                                    setStudents([]);
+                                    setSelectedStudents(new Set());
+                                } else {
+                                    alert("Ошибка при сохранении данных: " + response.error);
+                                }
+                            })
+                            .catch(err => {
+                                console.error("Ошибка сохранения:", err);
+                                alert("Ошибка при сохранении данных");
+                            });
+                    }
                 } else {
                     alert("Ошибка при сохранении данных: " + response.error);
                 }
@@ -155,7 +202,13 @@ export default function AddStudentsData() {
             prev.map(student => 
                 student.id === id ? { 
                     ...student, 
-                    [field]: field.endsWith('_id') ? parseInt(value) || null : value 
+                    [field]: field.endsWith('_id') ? parseInt(value) || null : value,
+                    group_name: field === "group_id" 
+                        ? groups.find(g => g.id === parseInt(value))?.name || "—" 
+                        : student.group_name,
+                    specialty_name: field === "specialty_id" 
+                        ? specialties.find(s => s.id === parseInt(value))?.name || "—" 
+                        : student.specialty_name
                 } : student
             )
         );
@@ -296,6 +349,7 @@ export default function AddStudentsData() {
                                     <tr key={student.id || index}>
                                         <td>
                                             <input
+                                                className={styles.tableCheckBox}
                                                 type="checkbox"
                                                 checked={selectedStudents.has(student.id)}
                                                 onChange={() => toggleSelectStudent(student.id)}
@@ -335,9 +389,10 @@ export default function AddStudentsData() {
                                                     ))}
                                                 </select>
                                             ) : (
-                                                student.group_name || "—"
+                                                groups.find(g => g.id === student.group_id)?.name || "—"
                                             )}
                                         </td>
+
                                         <td>
                                             {isEditing[student.id] ? (
                                                 <select
@@ -350,12 +405,12 @@ export default function AddStudentsData() {
                                                     ))}
                                                 </select>
                                             ) : (
-                                                student.specialty_name || "—"
+                                                specialties.find(s => s.id === student.specialty_id)?.name || "—"
                                             )}
                                         </td>
-                                        <td>
-                                            <button onClick={() => toggleEdit(student.id)}>✏️</button>
-                                            <button onClick={() => removeStudent(student.id)}>❌</button>
+                                        <td className={styles.table__button}>
+                                            <button className={styles.table__btn} onClick={() => toggleEdit(student.id)}><Arrow className={styles.table__btn__Arrow}/></button>
+                                            <button className={styles.table__btn} onClick={() => removeStudent(student.id)}>❌</button>
                                         </td>
                                     </tr>
                                 ))}

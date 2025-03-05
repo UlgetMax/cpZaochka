@@ -211,19 +211,49 @@ ipcMain.handle("get-specialties", async () => {
 
 ipcMain.handle("add-students", async (event, students) => {
   try {
-    const query = `
-          INSERT INTO students (first_name, last_name, middle_name, group_id, specialty_id)
-          VALUES ($1, $2, $3, $4, $5)
-      `;
+
+    const duplicates = [];
 
     for (const student of students) {
-      await client.query(query, [
+
+      const checkQuery = `
+        SELECT id FROM students 
+        WHERE first_name = $1 
+        AND last_name = $2 
+        AND middle_name = $3
+      `;
+
+      const checkResult = await client.query(checkQuery, [
+        student.first_name,
+        student.last_name,
+        student.middle_name || null,
+      ]);
+      if (checkResult.rows.length > 0) {
+        duplicates.push(student);
+        continue; 
+      }
+
+      const insertQuery = `
+      INSERT INTO students (first_name, last_name, middle_name, group_id, specialty_id)
+      VALUES ($1, $2, $3, $4, $5)
+    `;
+      await client.query(insertQuery, [
         student.first_name,
         student.last_name,
         student.middle_name || null,
         student.group_id,
         student.specialty_id,
       ]);
+    }
+
+
+
+    if (duplicates.length > 0) {
+      return {
+        success: false,
+        error: "Найдены одинаковое ФИО",
+        duplicates
+      }
     }
 
     return { success: true };
@@ -314,7 +344,57 @@ ipcMain.handle("delete-students", async (event, students) => {
 
 
 
+ipcMain.handle("add-specialty", async (event, name) => {
+  try {
+    const checkQuery = `SELECT id FROM specialties WHERE name = $1`;
+    const checkResult = await client.query(checkQuery, [name]);
+
+    if (checkResult.rows.length > 0) {
+      return { success: false, error: "Специальность с таким названием уже существует" };
+    }
+
+    const insertQuery = `INSERT INTO specialties (name) VALUES ($1) RETURNING id`;
+    const res = await client.query(insertQuery, [name]);
+    return { success: true, id: res.rows[0].id };
+  } catch (err) {
+    console.error("Ошибка добавления специальности:", err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("update-specialty", async (event, id, name) => {
+  try {
+    const query = `
+      UPDATE specialties
+      SET name = $1
+      WHERE id = $2
+    `;
+    await client.query(query, [name, id]);
+    return { success: true };
+  } catch (err) {
+    console.error("Ошибка обновления специальности:", err);
+    return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("delete-specialty", async (event, id) => {
+  try {
+    const query = `
+      DELETE FROM specialties
+      WHERE id = $1
+    `;
+    await client.query(query, [id]);
+    return { success: true };
+  } catch (err) {
+    console.error("Ошибка удаления специальности:", err);
+    return { success: false, error: err.message };
+  }
+});
+
+
 ///BD
+
+
 
 ipcMain.handle("get-wasm-path", () => {
   return path.join(process.resourcesPath, "test.wasm");

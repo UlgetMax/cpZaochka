@@ -30,7 +30,7 @@
       }
 
       .addStudents__wrapper__btn {
-        @include select-style;
+        @include button-sub-style;
       }
     }
 
@@ -74,6 +74,39 @@
 
       .studentsTable {
         @extend .table;
+
+        
+        // .table__button {
+        //   cursor: default;
+        //   display: flex;
+        //   justify-content: center;
+        //   gap: 25px;
+
+        //   .table__btn {
+        //     background-color: $background-color;
+        //     padding: 5px;
+        //     border-radius: 5px;
+
+        //     transition: 0.2s ease-in;
+  
+        //     .table__btn__Arrow {
+        //       color: $light-text-colot;
+        //       width: 24px;
+        //       height: 24px;
+  
+        //     } 
+
+        //     &:hover {
+        //       background-color: $border-color;
+
+        //       .studentsTable__btn__Arrow {
+        //         color: $background-color;    
+        //       } 
+        //     }
+        //   }
+
+        // }
+        
         // width: 100%;
         // border-collapse: collapse;
 
