@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState} from "react";
 import styles from "./addSpecializedData.module.scss";
 
 export default function AddSpecializedData() {
@@ -8,30 +8,16 @@ export default function AddSpecializedData() {
     const [editingId, setEditingId] = useState(null);
     const [editingName, setEditingName] = useState("");
 
-    const inputRef = useRef(null); 
-
     useEffect(() => {
         if (window.electron) {
             window.electron.getSpecialties().then(setSpecialties).catch(console.error);
         }
     }, []);
 
-    useEffect(() => {
-        setTimeout(() => {
-            if (inputRef.current) {
-                inputRef.current.disabled = false; 
-                inputRef.current.focus();
-            }
-        }, 0);
-    }, [specialties]);
-
-
     const handleAddSpecialty = async () => {
         if (!newSpecialty.trim()) {
             alert("Название специальности не может быть пустым!");
             setNewSpecialty("");
-            inputRef.current.disabled = false; // Разблокируем
-            inputRef.current?.focus();
             return;
         }
 
@@ -41,11 +27,6 @@ export default function AddSpecializedData() {
                 const updatedSpecialties = await window.electron.getSpecialties();
                 setSpecialties(updatedSpecialties);
                 setNewSpecialty("");
-
-                setTimeout(() => {
-                    inputRef.current.disabled = false;
-                    inputRef.current?.focus();
-                }, 0);
             } else {
                 alert("Ошибка при добавлении специальности: " + response.error);
             }
@@ -62,7 +43,6 @@ export default function AddSpecializedData() {
         try {
             const response = await window.electron.deleteSpecialty(id);
             if (response.success) {
-                // Обновляем список после удаления
                 const updatedSpecialties = await window.electron.getSpecialties();
                 setSpecialties(updatedSpecialties);
             } else {
@@ -73,6 +53,7 @@ export default function AddSpecializedData() {
             alert("Ошибка при удалении специальности");
         }
     };
+
     
     
     const handleEditSpecialty = (id) => {
@@ -113,8 +94,7 @@ export default function AddSpecializedData() {
                     placeholder="Название специальности"
                     value={newSpecialty}
                     onChange={(e) => setNewSpecialty(e.target.value)}
-                    ref={inputRef}
-                    disabled={true}
+                    key={specialties.length}
                 />
                 <button onClick={handleAddSpecialty}>Добавить</button>
             </div>

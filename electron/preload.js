@@ -6,7 +6,12 @@ contextBridge.exposeInMainWorld("electron", {
   getWasmPath: () => ipcRenderer.invoke("get-wasm-path"),
   getUsers: () => ipcRenderer.invoke("get-users"),
   checkDbStatus: () => ipcRenderer.invoke("check-db"),
+
   getGroups: () => ipcRenderer.invoke("get-groups"),
+  addGroup: (group) => ipcRenderer.invoke("add-group", group),
+  updateGroup: (id, group) => ipcRenderer.invoke("update-group", id, group),
+  deleteGroup: (id) => ipcRenderer.invoke("delete-group", id),
+
   getStudentsByGroup: (groupId) => ipcRenderer.invoke("get-students-by-group", groupId),
   
   getSpecialties: () => ipcRenderer.invoke("get-specialties"),

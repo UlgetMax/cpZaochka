@@ -7,6 +7,7 @@ import AddStudentsData from "../../components/AddStudentsData/AddStudentsData";
 // import ManageGroups from "./ManageGroups";
 import Arrow from "../../img/svg/Arrow.svg";
 import AddSpecializedData from "../../components/AddSpecializedData/AddSpecialized";
+import AddGroupsData from "../../components/AddGroupsData/AddGroupsData";
 
 export default function AddData() {
     const navigate = useNavigate();
@@ -32,7 +33,7 @@ export default function AddData() {
             <div className={styles.content}>
                 {activeTab === "students" && <AddStudentsData />}
                 {activeTab == "specialties" && <AddSpecializedData/>}
-                {/* {activeTab === "groups" && <ManageGroups />}  */}
+                {activeTab == "groups" && <AddGroupsData/>}
             </div>
         </div>
     );

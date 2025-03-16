@@ -1,0 +1,54 @@
+@use "../../styles/globalStyles" as *;
+
+.helpSystem {
+    margin: 0 auto;
+    width: 100%;
+    padding: 30px 20px 0 20px;
+    color: $main-text-color;
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+        @include titleText;
+    }
+
+    .helpSystem__container {
+        display: flex;
+
+        .helpSystem__sidebar {
+            width: 250px;
+            margin-right: 20px;
+            border-right: 1px solid $border-color;
+
+            ul {
+                list-style: none;
+                padding: 0;
+
+                li {
+                    margin-bottom: 14px;
+
+                    .helpSystem__sidebar__text {
+                        text-decoration: none;
+                        color: $main-text-color;
+                        font-weight: bold;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        transition: 0.3s ease-in;
+
+                        &:hover {
+                            color: $light-text-colot;
+                            background-color: $background-color;
+                        }
+                    }
+                    &:last-child {
+                        margin: 0;
+                    }
+                }
+            }
+        }
+
+        .helpSystem__content {
+            flex: 1; 
+        }
+    }
+}

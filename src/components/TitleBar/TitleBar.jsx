@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 import styles from "./TitleBar.module.scss";
 
 import Logo from "../../../electron/assets/IconKitchen-Output/android/play_store_512.ico";
+import { Link } from "react-router-dom";
 
 export default function TitleBar() {
     const handleMinimize = () => window.electron.send("minimize-window");
@@ -68,7 +69,10 @@ export default function TitleBar() {
                             <span>Помощь</span>
                             {openDropdown === "help" && (
                                 <div className={styles.dropdown}>
-                                    <div className={styles.dropdownItem}>Документация</div>
+                                    <div className={styles.dropdownItem}>
+                                        <Link to={"/help"} className={styles.home__addData__btn}>
+                                            Документация
+                                        </Link></div>
                                     <div className={styles.dropdownItem}>О программе</div>
                                 </div>
                             )}

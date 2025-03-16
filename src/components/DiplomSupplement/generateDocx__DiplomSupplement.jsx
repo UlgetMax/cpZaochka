@@ -2,6 +2,22 @@ import { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, Width
 import { saveAs } from "file-saver";
 
 export function generateDocx__DiplomSupplement(tables) {
+    const numberToText = (num) => {
+        const gradesMap = {
+            1: "один",
+            2: "два",
+            3: "три",
+            4: "четыре",
+            5: "пять",
+            6: "шесть",
+            7: "семь",
+            8: "восемь",
+            9: "девять",
+            10: "десять",
+        };
+        return gradesMap[num] ? `${num} (${gradesMap[num]})` : num;
+    };
+
     const doc = new Document({
         styles: {
             default: {
@@ -69,12 +85,17 @@ export function generateDocx__DiplomSupplement(tables) {
                     new Paragraph({}),
 
                     new Paragraph({
-                        alignment: AlignmentType.LEFT,
+                        alignment: AlignmentType.CENTER,
                         children: [
                             new TextRun({
                                 text: `отметок успеваемости учащихся группы № ${table.group}`,
                                 size: 28,
                             }),
+                        ],
+                    }),
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [
                             new TextRun({
                                 text: `(для занесения в приложение к диплому)`,
                                 size: 28,
@@ -86,12 +107,16 @@ export function generateDocx__DiplomSupplement(tables) {
 
                     new Paragraph({
                         alignment: AlignmentType.LEFT,
+                        spacing: {
+                            line: 360, 
+                            lineRule: "auto", 
+                        },
                         children: [
                             new TextRun({
                                 text: "Специальность ",
                             }),
                             new TextRun({
-                                text: `      ${table.specialization}      `,
+                                text: `      «${table.specialization}»      `,
                                 underline: {},
                             }),
                         ],
@@ -99,6 +124,10 @@ export function generateDocx__DiplomSupplement(tables) {
 
                     new Paragraph({
                         alignment: AlignmentType.LEFT,
+                        spacing: {
+                            line: 360, 
+                            lineRule: "auto", 
+                        },
                         children: [
                             new TextRun({
                                 text: "Наименование учебной дисциплины ",
@@ -111,6 +140,10 @@ export function generateDocx__DiplomSupplement(tables) {
                     }),
                     new Paragraph({
                         alignment: AlignmentType.LEFT,
+                        spacing: {
+                            line: 360, 
+                            lineRule: "auto", 
+                        },
                         children: [
                             new TextRun({
                                 text: "Преподаватель ",
@@ -124,7 +157,7 @@ export function generateDocx__DiplomSupplement(tables) {
 
                     new Paragraph({}),
 
-                    // Таблица с данными
+                    
                     new Table({
                         width: { size: 100, type: WidthType.PERCENTAGE },
                         rows: [
@@ -140,11 +173,22 @@ export function generateDocx__DiplomSupplement(tables) {
                             ...table.students.map((student, index) =>
                                 new TableRow({
                                     children: [
-                                        new TableCell({ children: [cellText(index + 1)] }),
+                                        new TableCell({ children: [cellText(`${index + 1}.`)] }),
                                         new TableCell({ children: [cellText(student.full_name)] }),
-                                        new TableCell({ children: [cellText(student.semestrGrades)] }), // Оценки за семестры
-                                        new TableCell({ children: [cellText(student.diplomGrade)] }), // Отметка к диплому
-                                        new TableCell({ children: [cellText("")] }), // Подпись преподавателя
+                                        new TableCell({ 
+                                            children: [cellText(
+                                                student.semestrGrades
+                                                    ?.split(" ")
+                                                    .map(num => numberToText(num))
+                                                    .join(" ") || "—"
+                                            )] 
+                                        }), 
+                                        new TableCell({ 
+                                            children: [cellText(
+                                                numberToText(student.diplomGrade) || "—"
+                                            )] 
+                                        }), 
+                                        new TableCell({ children: [cellText("")] }), 
                                     ],
                                 })
                             ),

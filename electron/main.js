@@ -189,15 +189,55 @@ ipcMain.handle("check-db", async () => {
 });
 
 
+// - Group
 ipcMain.handle("get-groups", async () => {
   try {
-    const res = await client.query("SELECT id, name FROM groups");
-    return res.rows; // [{ id: 1, name: 'П-303' }, ...]
+    const res = await client.query("SELECT id, name, course, semester FROM groups");
+    return res.rows; // [{ id: 1, name: 'П-303', course: 3, semester: 5 }, ...]
   } catch (err) {
     console.error("Ошибка получения групп:", err);
     return [];
   }
 });
+
+ipcMain.handle("update-group", async (_, groupId, updatedGroup) => {
+  try {
+      await client.query(
+          "UPDATE groups SET name = $1, course = $2, semester = $3 WHERE id = $4",
+          [updatedGroup.name, updatedGroup.course, updatedGroup.semester, groupId]
+      );
+      return { success: true };
+  } catch (err) {
+      console.error("Ошибка обновления группы:", err);
+      return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("add-group", async (_, group) => {
+  try {
+      const res = await client.query(
+          "INSERT INTO groups (name, course, semester) VALUES ($1, $2, $3) RETURNING id",
+          [group.name, group.course, group.semester]
+      );
+      return { success: true, id: res.rows[0].id };
+  } catch (err) {
+      console.error("Ошибка добавления группы:", err);
+      return { success: false, error: err.message };
+  }
+});
+
+ipcMain.handle("delete-group", async (_, groupId) => {
+  try {
+      await client.query("DELETE FROM groups WHERE id = $1", [groupId]);
+      return { success: true };
+  } catch (err) {
+      console.error("Ошибка удаления группы:", err);
+      return { success: false, error: err.message };
+  }
+});
+
+// -
+
 
 ipcMain.handle("get-specialties", async () => {
   try {

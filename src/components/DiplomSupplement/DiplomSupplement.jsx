@@ -34,14 +34,14 @@ export default function DiplomSupplement() {
 
     const handlePrintDocx = () => {
         const tablesData = tables.map((table) => ({
-            group: table.group?.name || "—",
-            specialization: table.specialization || "—",
-            predmet: table.predmet,
-            teacher: table.teacher,
+            group: table.group?.name || "—", 
+            specialization: table.specialization || "—", 
+            predmet: table.predmet, 
+            teacher: table.teacher, 
             students: table.students.map((student) => ({
                 full_name: student.full_name,
-                semestrGrades: student.grades?.semestrGrades || "—",
-                diplomGrade: student.grades?.diplomGrade || "—",
+                semestrGrades: table.grades[student.id]?.semestrGrades || "—", 
+                diplomGrade: table.grades[student.id]?.diplomGrade || "—", 
             })),
         }));
 
@@ -49,11 +49,15 @@ export default function DiplomSupplement() {
     };
 
     const addTable = () => {
+        const specialization = students.length > 0 ? students[0].specialty_name : "—";
+
         const newTable = {
             id: Date.now(),
             predmet: predmet,
             teacher: teacher,
             students: students,
+            group: selectedGroup,
+            specialization: specialization,
             grades: {...grades}
         };
         setTables([...tables, newTable]);
@@ -107,6 +111,24 @@ export default function DiplomSupplement() {
                 [field]: value, 
             },
         }));
+
+        setTables(prevTables =>
+            prevTables.map(table => {
+                if (table.students.some(student => student.id === id)) {
+                    return {
+                        ...table,
+                        grades: {
+                            ...table.grades,
+                            [id]: {
+                                ...table.grades[id],
+                                [field]: value,
+                            },
+                        },
+                    };
+                }
+                return table;
+            })
+        );
     };
 
 

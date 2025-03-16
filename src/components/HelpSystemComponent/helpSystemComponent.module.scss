@@ -1,0 +1,24 @@
+@use "../../styles/globalStyles" as *;
+
+
+.instructions {
+    color: $main-text-color;
+
+    h2 {
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    p {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    ul {
+        
+
+        li {
+            list-style-type: circle;
+        }
+    }
+}
