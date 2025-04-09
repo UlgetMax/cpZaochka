@@ -1,9 +1,12 @@
 const { app, BrowserWindow, ipcMain, screen, Menu } = require('electron');
 const { exec } = require("child_process");
+// const edge = require('edge-js');
 const path = require("path");
 const fs = require("fs");
 
 
+
+// const dllPath = path.join(__dirname, 'InsertText.dll');
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -27,15 +30,14 @@ const createWindow = () => {
     win.loadFile(path.join(app.getAppPath(), "dist/index.html"));
   }
 
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 };
 
 
-
-ipcMain.handle("insert-text-excel", async (event, text, row, column) => {
+ipcMain.handle("insert-text-excel", async (event, text) => {
   try {
     const scriptPath = path.join(__dirname, "insertTextExcel.ps1");
-    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -text "${text}" -row ${row} -column ${column}`;
+    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -text "${text}"`;
 
     console.log(`Запускаем команду: ${command}`);
 
@@ -54,6 +56,7 @@ ipcMain.handle("insert-text-excel", async (event, text, row, column) => {
     console.error("Ошибка при вызове insert-text-excel:", err);
   }
 });
+
 
 
 
@@ -112,12 +115,53 @@ ipcMain.handle("insert-docx-word", async () => {
 });
 
 
-ipcMain.handle("get-wasm-path", () => {
-  return path.join(process.resourcesPath, "test.wasm");
+ipcMain.handle("insert-list-word", async (event, students) => {
+  try {
+    const scriptPath = path.join(__dirname, "insertListWord.ps1");
+    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -students '${JSON.stringify(students)}'`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Ошибка выполнения: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Ошибка PowerShell: ${stderr}`);
+        return;
+      }
+      console.log(`PowerShell вывел: ${stdout}`);
+    });
+  } catch (err) {
+    console.error("Ошибка при вызове insert-list-word:", err);
+  }
+});
+
+ipcMain.handle("insert-list-excel", async (event, students) => {
+  try {
+    const scriptPath = path.join(__dirname, "insertListExcel.ps1");
+    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -students '${JSON.stringify(students)}'`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`Ошибка выполнения: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`Ошибка PowerShell: ${stderr}`);
+        return;
+      }
+      console.log(`PowerShell вывел: ${stdout}`);
+    });
+  } catch (err) {
+    console.error("Ошибка при вызове insert-list-excel:", err);
+  }
 });
 
 
 
+ipcMain.handle("get-wasm-path", () => {
+  return path.join(process.resourcesPath, "test.wasm");
+});
 
 
 const checkProcesses = () => {

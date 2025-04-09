@@ -1,28 +1,31 @@
 param (
-    [string]$text,
-    [int]$row,
-    [int]$column
+    [string]$text
 )
 
-# Попытка подключиться к открытому экземпляру Excel, если он уже запущен
+# Попытка подключиться к открытому экземпляру Excel
 try {
     $excel = [Runtime.Interopservices.Marshal]::GetActiveObject("Excel.Application")
 } catch {
-    $excel = New-Object -ComObject Excel.Application
+    Write-Output "Excel не запущен!"
+    exit 1
 }
 
 $excel.Visible = $true
 
-# Получаем активную рабочую книгу, если она существует
-if ($excel.Workbooks.Count -gt 0) {
-    $workbook = $excel.ActiveWorkbook
-} else {
-    # Если нет открытых рабочих книг, создаем новый
-    $workbook = $excel.Workbooks.Add()
+# Проверяем, есть ли активная книга
+if ($excel.Workbooks.Count -eq 0) {
+    Write-Output "Нет открытых книг в Excel!"
+    exit 1
 }
 
-# Получаем первый лист
-$sheet = $workbook.Sheets.Item(1)
+$workbook = $excel.ActiveWorkbook
+$sheet = $workbook.ActiveSheet
 
-# Вставляем текст в указанную ячейку
-$sheet.Cells.Item($row, $column).Value = $text
+# Проверяем, есть ли активная ячейка
+if ($excel.Application.ActiveCell -eq $null) {
+    Write-Output "Нет активной ячейки!"
+    exit 1
+}
+
+# Вставляем текст в активную ячейку
+$excel.Application.ActiveCell.Value = $text

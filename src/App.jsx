@@ -3,8 +3,14 @@ import { useEffect, useState } from "react";
 function App() {
   const [processes, setProcesses] = useState([]);
   const [textToInsert, setTextToInsert] = useState("");
-  const [row, setRow] = useState(1); // добавляем состояние для строки
-  const [column, setColumn] = useState(1); // добавляем состояние для столбца
+  const [students, setStudents] = useState([
+    "Иванов Иван",
+    "Петров Петр",
+    "Сидоров Сидор",
+    "Алексеев Алексей",
+    "Федоров Федор"
+  ]);
+  const [insertMode, setInsertMode] = useState("text"); // "text" или "list"
 
   useEffect(() => {
     const checkProcesses = async () => {
@@ -21,20 +27,28 @@ function App() {
   }, []);
 
   const handleInsertText = async () => {
-    if (textToInsert) {
-      try {
-        if (processes.some((proc) => proc.name === "Microsoft Word")) {
+    try {
+      if (processes.some((proc) => proc.name === "Microsoft Word")) {
+        if (insertMode === "text") {
           await window.electron.invoke("insert-text-word", textToInsert);
-        } else if (processes.some((proc) => proc.name === "Microsoft Excel")) {
-          await window.electron.invoke("insert-text-excel", textToInsert, row, column); // передаем row и column
         } else {
-          alert("Word или Excel не запущены");
+          await window.electron.invoke("insert-list-word", students);
         }
-      } catch (error) {
-        alert(`Ошибка при вставке текста: ${error}`);
+      } else if (processes.some((proc) => proc.name === "Microsoft Excel")) {
+        if (insertMode === "text") {
+          await window.electron.invoke("insert-text-excel", textToInsert);
+        } else {
+          await window.electron.invoke("insert-list-excel", students);
+        }
+      } else {
+        alert("Word или Excel не запущены");
       }
+    } catch (error) {
+      alert(`Ошибка при вставке: ${error}`);
     }
   };
+  
+  
 
   const handleInsertDocxWord = async () => {
     try {
@@ -59,32 +73,31 @@ function App() {
       )}
 
       <div>
-        <input
-          type="text"
-          value={textToInsert}
-          onChange={(e) => setTextToInsert(e.target.value)}
-          placeholder="Введите текст для вставки"
-        />
-        <div>
-          <label>
-            Строка:
-            <input
-              type="number"
-              value={row}
-              onChange={(e) => setRow(parseInt(e.target.value))}
-            />
-          </label>
-        </div>
-        <div>
-          <label>
-            Столбец:
-            <input
-              type="number"
-              value={column}
-              onChange={(e) => setColumn(parseInt(e.target.value))}
-            />
-          </label>
-        </div>
+
+
+
+        <label>
+          <select value={insertMode} onChange={(e) => setInsertMode(e.target.value)}>
+            <option value="text">Вставить текст</option>
+            <option value="list">Вставить список</option>
+          </select>
+        </label>
+
+        {insertMode === "text" ? (
+          <input
+            type="text"
+            value={textToInsert}
+            onChange={(e) => setTextToInsert(e.target.value)}
+            placeholder="Введите текст для вставки"
+          />
+        ) : (
+          <ul>
+            {students.map((student, index) => (
+              <li key={index}>{student}</li>
+            ))}
+          </ul>
+        )}
+
         <button onClick={handleInsertText}>Вставить текст в Word или Excel</button>
         <button onClick={handleInsertDocxWord}>Вставить ведомость в Word</button>
       </div>
