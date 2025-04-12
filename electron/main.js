@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
-
+const wordAddon = require("../build/Release/wordAutomation");
 
 // const dllPath = path.join(__dirname, 'InsertText.dll');
 
@@ -30,30 +30,49 @@ const createWindow = () => {
     win.loadFile(path.join(app.getAppPath(), "dist/index.html"));
   }
 
-  // win.webContents.openDevTools();
+  win.webContents.openDevTools();
 };
+
+
+function getForegroundProcessName() {
+  const hwnd = require("node-window-manager").getActiveWindow();
+  if (!hwnd) return null;
+  const proc = hwnd.process;
+  return proc ? path.basename(proc.path) : null;
+}
+
+ipcMain.handle("get-active-process", async () => {
+  try {
+    const name = getForegroundProcessName();
+    return name || null;
+  } catch (e) {
+    return null;
+  }
+});
+
+ipcMain.handle("insert-text-smart", async (event, text, processName) => {
+  try {
+    return wordAddon.insertTextSmart(text, processName);
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
 
 
 ipcMain.handle("insert-text-excel", async (event, text) => {
   try {
-    const scriptPath = path.join(__dirname, "insertTextExcel.ps1");
-    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -text "${text}"`;
-
-    console.log(`Запускаем команду: ${command}`);
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Ошибка выполнения: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Ошибка PowerShell: ${stderr}`);
-        return;
-      }
-      console.log(`PowerShell вывел: ${stdout}`);
-    });
+    console.log('Trying to insert text:', text);
+    const start = Date.now();
+    wordAddon.insertTextToExcel(text);
+    console.log(`Success in ${Date.now() - start}ms`);
+    return { success: true };
   } catch (err) {
-    console.error("Ошибка при вызове insert-text-excel:", err);
+    console.error('Native module error:', err);
+    return { 
+      success: false, 
+      error: err.message,
+      stack: err.stack 
+    };
   }
 });
 
@@ -63,24 +82,18 @@ ipcMain.handle("insert-text-excel", async (event, text) => {
 
 ipcMain.handle("insert-text-word", async (event, text) => {
   try {
-    const scriptPath = path.join(__dirname, "insertText.ps1");
-    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -text "${text}"`;
-
-    console.log(`Запускаем команду: ${command}`);
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Ошибка выполнения: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Ошибка PowerShell: ${stderr}`);
-        return;
-      }
-      console.log(`PowerShell вывел: ${stdout}`);
-    });
+    console.log('Trying to insert text:', text);
+    const start = Date.now();
+    wordAddon.insertTextToWord(text);
+    console.log(`Success in ${Date.now() - start}ms`);
+    return { success: true };
   } catch (err) {
-    console.error("Ошибка при вызове insert-text-word:", err);
+    console.error('Native module error:', err);
+    return { 
+      success: false, 
+      error: err.message,
+      stack: err.stack 
+    };
   }
 });
 
@@ -164,31 +177,9 @@ ipcMain.handle("get-wasm-path", () => {
 });
 
 
-const checkProcesses = () => {
-  return new Promise((resolve) => {
-    exec('tasklist', (err, stdout) => {
-      if (err) {
-        resolve([]);
-        return;
-      }
-
-      const processes = [];
-      if (stdout.includes("WINWORD.EXE")) {
-        processes.push({ name: "Microsoft Word" });
-      }
-      if (stdout.includes("EXCEL.EXE")) {
-        processes.push({ name: "Microsoft Excel" });
-      }
-
-      resolve(processes);
-    });
-  });
-};
-
-ipcMain.handle("check-processes", async () => {
-  return await checkProcesses();
+ipcMain.handle("get-processes", () => {
+  return wordAddon.getProcesses(); 
 });
-
 
 
 app.whenReady().then(async () => {
