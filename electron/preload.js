@@ -2,8 +2,12 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("electron", {
   getProcesses: () => ipcRenderer.invoke("get-processes"),
-  insertTextToWord: (text) => ipcRenderer.invoke("insert-text-word", text),
-  insertTextToExcel: (text) => ipcRenderer.invoke("insert-text-excel", text),
-  insertTextSmart: (text, process) => ipcRenderer.invoke("insert-text-smart", text, process),
-  getActiveProcess: () => ipcRenderer.invoke("get-active-process")
+  
+  getActiveProcess: () => ipcRenderer.invoke("get-active-process"),
+  setLastActiveProcess: (name) => ipcRenderer.invoke("set-last-process", name),
+  insertTextSmart: (text) => ipcRenderer.invoke("insert-smart", text),
+
+  replacePlaceholdersInWord: (dict) => ipcRenderer.invoke("replace-placeholders-word", dict),
+
+
 });

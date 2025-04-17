@@ -1,19 +1,14 @@
 const { app, BrowserWindow, ipcMain, screen, Menu } = require('electron');
-const { exec } = require("child_process");
-// const edge = require('edge-js');
 const path = require("path");
-const fs = require("fs");
 
 const wordAddon = require("../build/Release/wordAutomation");
-
-// const dllPath = path.join(__dirname, 'InsertText.dll');
 
 const isDev = process.env.NODE_ENV === 'development';
 
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 900,
-    height: 700,
+    width: 600,
+    height: 750,
     alwaysOnTop: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -29,146 +24,51 @@ const createWindow = () => {
   } else {
     win.loadFile(path.join(app.getAppPath(), "dist/index.html"));
   }
-
   win.webContents.openDevTools();
+
+
 };
+console.log("");
+console.log("");
+console.log("");
 
+console.log("Electron arch:", process.arch);
+console.log("");
+console.log("");
+console.log("");
 
-function getForegroundProcessName() {
-  const hwnd = require("node-window-manager").getActiveWindow();
-  if (!hwnd) return null;
-  const proc = hwnd.process;
-  return proc ? path.basename(proc.path) : null;
-}
-
-ipcMain.handle("get-active-process", async () => {
-  try {
-    const name = getForegroundProcessName();
-    return name || null;
-  } catch (e) {
-    return null;
-  }
+ipcMain.handle("get-processes", () => {
+  return wordAddon.getProcesses(); 
 });
 
-ipcMain.handle("insert-text-smart", async (event, text, processName) => {
+ipcMain.handle("get-active-process", () => {
+  return wordAddon.getActiveProcessName();
+});
+
+ipcMain.handle("set-last-process", (event, processName) => {
+  return wordAddon.setLastActiveProcess(processName);
+});
+
+ipcMain.handle("insert-smart", (event, text) => {
+  return wordAddon.insertTextSmart(text); 
+});
+
+ipcMain.handle("insert-multi-word", (event, textArray) => {
+  return wordAddon.insertTextMultiWord(textArray);
+});
+
+ipcMain.handle("replace-placeholders-word", async (event, dict) => {
   try {
-    return wordAddon.insertTextSmart(text, processName);
+    const result = wordAddon.replacePlaceholdersInWord(dict);
+    return result;
   } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-
-ipcMain.handle("insert-text-excel", async (event, text) => {
-  try {
-    console.log('Trying to insert text:', text);
-    const start = Date.now();
-    wordAddon.insertTextToExcel(text);
-    console.log(`Success in ${Date.now() - start}ms`);
-    return { success: true };
-  } catch (err) {
-    console.error('Native module error:', err);
-    return { 
-      success: false, 
-      error: err.message,
-      stack: err.stack 
-    };
+    console.error("Ошибка при автозаполнении:", err.message);
+    return false;
   }
 });
 
 
 
-
-
-ipcMain.handle("insert-text-word", async (event, text) => {
-  try {
-    console.log('Trying to insert text:', text);
-    const start = Date.now();
-    wordAddon.insertTextToWord(text);
-    console.log(`Success in ${Date.now() - start}ms`);
-    return { success: true };
-  } catch (err) {
-    console.error('Native module error:', err);
-    return { 
-      success: false, 
-      error: err.message,
-      stack: err.stack 
-    };
-  }
-});
-
-
-
-ipcMain.handle("insert-docx-word", async () => {
-  try {
-    const filePath = path.join(__dirname, "vedomost.docx");
-
-    if (!fs.existsSync(filePath)) {
-      return "Файл ведомости не найден!";
-    }
-
-    // Запускаем PowerShell-скрипт
-    const psScript = path.join(__dirname, "insert_docx.ps1");
-    exec(`powershell -ExecutionPolicy Bypass -File "${psScript}" "${filePath}"`, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Ошибка: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Ошибка: ${stderr}`);
-        return;
-      }
-      // console.log(`Вывод: ${stdout}`);
-    });
-
-    return "Ведомость вставлена в Word!";
-  } catch (error) {
-    return `Ошибка: ${error.message}`;
-  }
-});
-
-
-ipcMain.handle("insert-list-word", async (event, students) => {
-  try {
-    const scriptPath = path.join(__dirname, "insertListWord.ps1");
-    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -students '${JSON.stringify(students)}'`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Ошибка выполнения: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Ошибка PowerShell: ${stderr}`);
-        return;
-      }
-      console.log(`PowerShell вывел: ${stdout}`);
-    });
-  } catch (err) {
-    console.error("Ошибка при вызове insert-list-word:", err);
-  }
-});
-
-ipcMain.handle("insert-list-excel", async (event, students) => {
-  try {
-    const scriptPath = path.join(__dirname, "insertListExcel.ps1");
-    const command = `powershell -ExecutionPolicy Bypass -NoProfile -File "${scriptPath}" -students '${JSON.stringify(students)}'`;
-
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Ошибка выполнения: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Ошибка PowerShell: ${stderr}`);
-        return;
-      }
-      console.log(`PowerShell вывел: ${stdout}`);
-    });
-  } catch (err) {
-    console.error("Ошибка при вызове insert-list-excel:", err);
-  }
-});
 
 
 
@@ -177,9 +77,6 @@ ipcMain.handle("get-wasm-path", () => {
 });
 
 
-ipcMain.handle("get-processes", () => {
-  return wordAddon.getProcesses(); 
-});
 
 
 app.whenReady().then(async () => {

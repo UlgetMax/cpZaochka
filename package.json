@@ -24,7 +24,6 @@
     "menubar": "^9.5.1",
     "node-addon-api": "^8.3.1",
     "node-gyp": "^11.2.0",
-    "node-window-manager": "^2.2.4",
     "pg": "^8.13.3",
     "pizzip": "^3.1.8",
     "react": "^18.3.1",
@@ -74,7 +73,8 @@
       "dist/**/*",
       "electron/**/*",
       "node_modules/**/*",
-      "package.json"
+      "package.json",
+      "build/**/*"
     ],
     "extraFiles": [
       {

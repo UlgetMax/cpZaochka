@@ -152,6 +152,9 @@
     <ClCompile Include="..\src\insertTextSmart.cpp">
       <ObjectFileName>$(IntDir)\src\insertTextSmart.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\src\insertReplacePlaceholders.cpp">
+      <ObjectFileName>$(IntDir)\src\insertReplacePlaceholders.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="D:\Storage_Programs\nvm\v20.18.2\node_modules\node-gyp\src\win_delay_load_hook.cc"/>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>

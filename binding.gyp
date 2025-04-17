@@ -7,7 +7,8 @@
         "src/getProcesses.cpp",
         "src/insertTextWord.cpp",
         "src/insertTextExcel.cpp",
-        "src/insertTextSmart.cpp"
+        "src/insertTextSmart.cpp",
+        "src/insertReplacePlaceholders.cpp"
         ],
       "include_dirs": [
         "<!(node -p \"require.resolve('node-addon-api').replace(/\\\\/g, '/').replace('/index.js', '')\")"
