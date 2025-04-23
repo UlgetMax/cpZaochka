@@ -7,7 +7,6 @@ contextBridge.exposeInMainWorld("electron", {
   setLastActiveProcess: (name) => ipcRenderer.invoke("set-last-process", name),
   insertTextSmart: (text) => ipcRenderer.invoke("insert-smart", text),
 
-  replacePlaceholdersInWord: (dict) => ipcRenderer.invoke("replace-placeholders-word", dict),
-
+  replacePlaceholdersInWord: (obj) => ipcRenderer.invoke("replacePlaceholdersInWord", obj),
 
 });

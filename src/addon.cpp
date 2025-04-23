@@ -10,6 +10,8 @@ extern Napi::Value GetActiveProcessName(const Napi::CallbackInfo& info);
 
 extern Napi::Value ReplacePlaceholdersInWord(const Napi::CallbackInfo& info);
 
+extern Napi::Value ReplaceHardcoded(const Napi::CallbackInfo& info);
+
 
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
@@ -23,6 +25,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set("getActiveProcessName", Napi::Function::New(env, GetActiveProcessName));
 
     exports.Set("replacePlaceholdersInWord", Napi::Function::New(env, ReplacePlaceholdersInWord));
+
 
     return exports;
 }

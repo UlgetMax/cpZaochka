@@ -350,7 +350,7 @@
     "openssl_quic": "true",
     "ossfuzz": "false",
     "shlib_suffix": "so.93",
-    "target_arch": "ia32",
+    "target_arch": "x64",
     "using_electron_config_gypi": 1,
     "v8_enable_31bit_smis_on_64bit_arch": 1,
     "v8_enable_gdbjit": 0,

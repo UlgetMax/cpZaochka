@@ -1,121 +1,183 @@
-#include <napi.h>
-#include <windows.h>
+﻿#include <napi.h>
+#include "utils.h"
 #include <comdef.h>
-#include <oleauto.h>
 #include <string>
+#include <vector>
+#include <utility>
 #include <map>
-
-std::wstring Utf8ToWide(const std::string& str) {
-    int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, nullptr, 0);
-    if (len <= 1) return L"";
-    std::wstring result(len - 1, L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1, &result[0], len);
-    return result;
-}
 
 Napi::Value ReplacePlaceholdersInWord(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
-
+    
     if (info.Length() < 1 || !info[0].IsObject()) {
-        Napi::TypeError::New(env, "Expected object").ThrowAsJavaScriptException();
+        Napi::TypeError::New(env, "Expected an object with replacements").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    std::map<std::wstring, std::wstring> replacements;
-    Napi::Object dict = info[0].As<Napi::Object>();
-    Napi::Array keys = dict.GetPropertyNames();
-    for (uint32_t i = 0; i < keys.Length(); ++i) {
-        std::string key = keys.Get(i).As<Napi::String>();
-        std::string val = dict.Get(key).As<Napi::String>();
-        replacements[Utf8ToWide(key)] = Utf8ToWide(val);
-    }
-
-    HRESULT hr = CoInitialize(nullptr);
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
     if (FAILED(hr)) {
-        Napi::Error::New(env, "COM initialization failed").ThrowAsJavaScriptException();
+        Napi::Error::New(env, "Failed to initialize COM").ThrowAsJavaScriptException();
         return env.Null();
     }
 
-    bool success = false;
-    IDispatch *pWord = nullptr, *pDoc = nullptr, *pContent = nullptr;
-    VARIANT result;
-    VariantInit(&result);
+    CLSID clsid;
+    IUnknown* pUnknown = nullptr;
+    IDispatch* pWordApp = nullptr;
 
     try {
-        CLSID clsid;
-        hr = CLSIDFromProgID(L"Word.Application", &clsid);
-        if (FAILED(hr)) throw std::runtime_error("CLSIDFromProgID failed");
-
-        hr = GetActiveObject(clsid, nullptr, (IUnknown**)&pWord);
-        if (FAILED(hr) || !pWord) throw std::runtime_error("Word is not running or cannot be accessed");
-
-        // Get ActiveDocument
-        DISPID dispID;
-        OLECHAR* name = L"ActiveDocument";
-        DISPPARAMS noArgs = { nullptr, nullptr, 0, 0 };
-
-        hr = pWord->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &dispID);
-        if (FAILED(hr)) throw std::runtime_error("Cannot get ActiveDocument");
-
-        VariantClear(&result);
-        hr = pWord->Invoke(dispID, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &noArgs, &result, nullptr, nullptr);
-        if (FAILED(hr) || result.vt != VT_DISPATCH || !result.pdispVal) throw std::runtime_error("ActiveDocument is not accessible");
-
-        pDoc = result.pdispVal;
-
-        // Get Content
-        name = L"Content";
-        VariantClear(&result);
-        hr = pDoc->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &dispID);
-        if (FAILED(hr)) throw std::runtime_error("No Content in document");
-
-        hr = pDoc->Invoke(dispID, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &noArgs, &result, nullptr, nullptr);
-        if (FAILED(hr) || result.vt != VT_DISPATCH || !result.pdispVal) throw std::runtime_error("Content is not accessible");
-
-        pContent = result.pdispVal;
-
-        // Get current text
-        name = L"Text";
-        VariantClear(&result);
-        hr = pContent->GetIDsOfNames(IID_NULL, &name, 1, LOCALE_USER_DEFAULT, &dispID);
-        if (FAILED(hr)) throw std::runtime_error("Cannot get Text");
-
-        hr = pContent->Invoke(dispID, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &noArgs, &result, nullptr, nullptr);
-        if (FAILED(hr) || result.vt != VT_BSTR || !result.bstrVal) throw std::runtime_error("Text is not accessible");
-
-        std::wstring text(result.bstrVal);
-        SysFreeString(result.bstrVal);
-
-        for (const auto& pair : replacements) {
-            size_t pos = 0;
-            while ((pos = text.find(pair.first, pos)) != std::wstring::npos) {
-                text.replace(pos, pair.first.length(), pair.second);
-                pos += pair.second.length();
+        Napi::Object replacementsObj = info[0].As<Napi::Object>();
+        std::vector<std::pair<std::wstring, std::wstring>> replacements;
+        
+        Napi::Array keys = replacementsObj.GetPropertyNames();
+        for (uint32_t i = 0; i < keys.Length(); i++) {
+            Napi::Value key = keys[i];
+            Napi::Value value = replacementsObj.Get(key);
+            
+            if (key.IsString() && value.IsString()) {
+                // Используем Utf16Value для получения широких строк
+                std::u16string u16key = key.As<Napi::String>().Utf16Value();
+                std::u16string u16value = value.As<Napi::String>().Utf16Value();
+                
+                // Конвертируем u16string в wstring
+                std::wstring wkey(u16key.begin(), u16key.end());
+                std::wstring wvalue(u16value.begin(), u16value.end());
+                
+                replacements.emplace_back(wkey, wvalue);
             }
         }
 
-        // Set updated text
-        VARIANT newText;
-        VariantInit(&newText);
-        newText.vt = VT_BSTR;
-        newText.bstrVal = SysAllocString(text.c_str());
+        hr = CLSIDFromProgID(L"Word.Application", &clsid);
+        if (FAILED(hr)) throw std::runtime_error("Word is not installed");
 
-        DISPPARAMS setParams = { &newText, nullptr, 1, 0 };
-        hr = pContent->Invoke(dispID, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYPUT, &setParams, nullptr, nullptr, nullptr);
-        SysFreeString(newText.bstrVal);
+        hr = GetActiveObject(clsid, NULL, &pUnknown);
+        if (FAILED(hr)) throw std::runtime_error("Word is not running");
 
-        success = SUCCEEDED(hr);
-    }
-    catch (const std::exception& ex) {
-        OutputDebugStringA(("❌ ReplaceText ERROR: " + std::string(ex.what()) + "\n").c_str());
+        hr = pUnknown->QueryInterface(IID_IDispatch, (void**)&pWordApp);
+        pUnknown->Release();
+        if (FAILED(hr)) throw std::runtime_error("Failed to get Word IDispatch");
+
+        // Остальной код остается без изменений
+        DISPID dispIDDoc;
+        VARIANT resultDoc;
+        VariantInit(&resultDoc);
+        DISPPARAMS noArgs = { nullptr, nullptr, 0, 0 };
+
+        if (FAILED(GetDispID(pWordApp, L"ActiveDocument", &dispIDDoc)) ||
+            FAILED(pWordApp->Invoke(dispIDDoc, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &noArgs, &resultDoc, nullptr, nullptr)) ||
+            resultDoc.vt != VT_DISPATCH) {
+            throw std::runtime_error("Failed to get ActiveDocument");
+        }
+
+        IDispatch* pDoc = resultDoc.pdispVal;
+
+        DISPID dispIDContent;
+        VARIANT contentResult;
+        VariantInit(&contentResult);
+        if (FAILED(GetDispID(pDoc, L"Content", &dispIDContent)) ||
+            FAILED(pDoc->Invoke(dispIDContent, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &noArgs, &contentResult, nullptr, nullptr)) ||
+            contentResult.vt != VT_DISPATCH) {
+            SafeRelease(&pDoc);
+            throw std::runtime_error("Failed to get Content");
+        }
+
+        IDispatch* pRange = contentResult.pdispVal;
+
+        DISPID dispIDFind;
+        VARIANT findResult;
+        VariantInit(&findResult);
+
+        if (FAILED(GetDispID(pRange, L"Find", &dispIDFind)) ||
+            FAILED(pRange->Invoke(dispIDFind, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET, &noArgs, &findResult, nullptr, nullptr)) ||
+            findResult.vt != VT_DISPATCH) {
+            SafeRelease(&pRange);
+            SafeRelease(&pDoc);
+            throw std::runtime_error("Failed to get Find");
+        }
+
+        IDispatch* pFind = findResult.pdispVal;
+
+        auto SetProperty = [](IDispatch* obj, const wchar_t* name, VARIANT val) {
+            DISPID dispID;
+            DISPID namedPut = DISPID_PROPERTYPUT;
+            DISPPARAMS dp = { &val, &namedPut, 1, 1 };
+            if (SUCCEEDED(GetDispID(obj, name, &dispID))) {
+                obj->Invoke(dispID, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYPUT, &dp, nullptr, nullptr, nullptr);
+            }
+        };
+
+        DISPID dispIDText;
+        if (FAILED(GetDispID(pRange, L"Text", &dispIDText))) {
+            SafeRelease(&pFind);
+            SafeRelease(&pRange);
+            SafeRelease(&pDoc);
+            throw std::runtime_error("Failed to get Text property ID");
+        }
+
+        DISPID dispIDExecute;
+        if (FAILED(GetDispID(pFind, L"Execute", &dispIDExecute))) {
+            SafeRelease(&pFind);
+            SafeRelease(&pRange);
+            SafeRelease(&pDoc);
+            throw std::runtime_error("Failed to get Execute method");
+        }
+
+        DISPID namedPut = DISPID_PROPERTYPUT;
+
+        for (const auto& replacement : replacements) {
+            const std::wstring& findText = replacement.first;
+            const std::wstring& replaceText = replacement.second;
+
+            VARIANT findTextVar;
+            findTextVar.vt = VT_BSTR;
+            findTextVar.bstrVal = SysAllocString(findText.c_str());
+
+            VARIANT forwardVar;
+            forwardVar.vt = VT_BOOL;
+            forwardVar.boolVal = VARIANT_TRUE;
+            
+            VARIANT wrapVar;
+            wrapVar.vt = VT_I4;
+            wrapVar.lVal = 1;
+
+            SetProperty(pFind, L"Text", findTextVar);
+            SetProperty(pFind, L"Forward", forwardVar);
+            SetProperty(pFind, L"Wrap", wrapVar);
+
+            VARIANT_BOOL found = VARIANT_FALSE;
+            do {
+                VARIANT result;
+                VariantInit(&result);
+                DISPPARAMS dpNoArgs = { nullptr, nullptr, 0, 0 };
+                hr = pFind->Invoke(dispIDExecute, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, &dpNoArgs, &result, nullptr, nullptr);
+                if (FAILED(hr)) break;
+
+                found = result.boolVal;
+                if (found == VARIANT_TRUE) {
+                    VARIANT newText;
+                    newText.vt = VT_BSTR;
+                    newText.bstrVal = SysAllocString(replaceText.c_str());
+
+                    DISPPARAMS dpSet = { &newText, &namedPut, 1, 1 };
+                    pRange->Invoke(dispIDText, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYPUT, &dpSet, nullptr, nullptr, nullptr);
+
+                    SysFreeString(newText.bstrVal);
+                }
+            } while (found == VARIANT_TRUE);
+
+            SysFreeString(findTextVar.bstrVal);
+        }
+
+        SafeRelease(&pFind);
+        SafeRelease(&pRange);
+        SafeRelease(&pDoc);
+        SafeRelease(&pWordApp);
+        CoUninitialize();
+
+        return Napi::Boolean::New(env, true);
+    } catch (const std::exception& ex) {
+        SafeRelease(&pWordApp);
+        CoUninitialize();
         Napi::Error::New(env, ex.what()).ThrowAsJavaScriptException();
+        return env.Null();
     }
-
-    if (pContent) pContent->Release();
-    if (pDoc) pDoc->Release();
-    if (pWord) pWord->Release();
-    VariantClear(&result);
-    CoUninitialize();
-
-    return Napi::Boolean::New(env, success);
 }

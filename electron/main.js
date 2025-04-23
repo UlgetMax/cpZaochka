@@ -4,7 +4,14 @@ const path = require("path");
 const wordAddon = require("../build/Release/wordAutomation");
 
 const isDev = process.env.NODE_ENV === 'development';
+console.log("");
+console.log("");
+console.log("");
 
+console.log("Electron arch:", process.arch);
+console.log("");
+console.log("");
+console.log("");
 const createWindow = () => {
   const win = new BrowserWindow({
     width: 600,
@@ -28,14 +35,7 @@ const createWindow = () => {
 
 
 };
-console.log("");
-console.log("");
-console.log("");
 
-console.log("Electron arch:", process.arch);
-console.log("");
-console.log("");
-console.log("");
 
 ipcMain.handle("get-processes", () => {
   return wordAddon.getProcesses(); 
@@ -57,16 +57,9 @@ ipcMain.handle("insert-multi-word", (event, textArray) => {
   return wordAddon.insertTextMultiWord(textArray);
 });
 
-ipcMain.handle("replace-placeholders-word", async (event, dict) => {
-  try {
-    const result = wordAddon.replacePlaceholdersInWord(dict);
-    return result;
-  } catch (err) {
-    console.error("Ошибка при автозаполнении:", err.message);
-    return false;
-  }
+ipcMain.handle("replacePlaceholdersInWord", (event, placeholders) => {
+  return wordAddon.replacePlaceholdersInWord(placeholders);
 });
-
 
 
 

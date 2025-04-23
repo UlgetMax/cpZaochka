@@ -1,6 +1,22 @@
-cd D:\Storage_Programs\emsdk
-./emsdk activate latest
-./emsdk_env.ps1
+
+-------------  Сборка для Windows 7 (32-bit):
+
+npm uninstall electron
+npm install electron@22.3.27 --arch=x32
+
+npm run build:win32
+
+
+-------------  Сборка для Windows 11/10 (64-bit):
+
+npm uninstall electron
+npm install --platform=win32 --arch=x64 electron@22.3.27 --save-dev
+
+
+npm run build:win64
+
+
+
 
 -- Чтобы скопилировать
 
@@ -16,20 +32,18 @@ npm run build
 
 npx electron-builder --win --ia32
 
-emcc -v
 
---
-    emcc test.cpp -o test.js -s MODULARIZE -s EXPORT_ES6=1 -s ENVIRONMENT=web
---
+-----------------   Создать build на С++ (64 - 32 менять)
 
---Предлагал такую команду GPT4
+--------- Для 64-bit (Windows 10/11 x64):
 
-emcc mycode.cpp -o mycode.js -sEXPORTED_FUNCTIONS=_printMessage -sEXPORTED_RUNTIME_METHODS=ccall,cwrap
+node-gyp configure --arch=x64 --target=22.3.27 --dist-url=https://electronjs.org/headers
+node-gyp build
 
---
+--------- Для 32-bit (Windows 7, Win32):
+node-gyp configure --arch=ia32 --target=22.3.27 --dist-url=https://electronjs.org/headers
+node-gyp build
 
-#####   emcc test.cpp -o test.html
+npm run dev
 
 
-
-python -m http.server (так файл .html)
